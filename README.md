@@ -1,40 +1,85 @@
-🚀 SPARC-PM: Space Weather Risk Classification & Predictive Maintenance Engine
-Project Name: SPARC-PM
-Target Operations Center: ISRO Mission Control Center Simulation (ISTRAC / MCF)
-Domain: Autonomous Space Operations, AI-Driven Risk Assessment, & Orbital Asset Survivability
+# 🚀 SPARC-PM: Space Weather Risk Classification & Predictive Maintenance Engine
 
-1. Executive Overview
-SPARC-PM is an integrated, real-time autonomous space operations decision-support platform designed for ISRO space missions. By fusing interplanetary space weather streams from ISRO's Aditya-L1 payloads (PAPA, ASPEX, MAG) with satellite Two-Line Element (TLE) orbital ephemeris and onboard sensor telemetry, SPARC-PM bridges the gap between passive data monitoring and millisecond-level threat mitigation.
-The platform provides an end-to-end operational pipeline featuring four core engines:
-•	Gaganyaan Crew Dosimetry Engine: LSTM time-series prediction and numerical definite integration using Simpson's Rule for solar proton radiation shielding.
-•	3D Satellite Fleet Digital Twin: SGP4 orbital propagation and 3D Euclidean spatial proximity profiling against magnetospheric storm centers.
-•	Predictive Maintenance Subsystem: CNN-LSTM anomaly detection and Naive Bayes failure classification for onboard subsystem telemetry.
-•	Closed-Loop Command Synthesizer: Resource-constrained integer optimization (A* / ILP) producing machine-executable CCSDS JSON telecommand packets signed with SHA-256 cryptographic hashes.
-2. Problem Statement
-Space weather phenomena—such as Coronal Mass Ejections (CMEs) and Solar Proton Events (SPEs)—pose severe threats to orbital assets and human spaceflight. Existing mission control operations suffer from three major bottlenecks:
-1. Dosimetry Blind Spots in Crewed Missions: Raw proton flux counts streamed from space sensors are not automatically converted into cumulative absorbed dose curves. Flight surgeons lack predictive tools that integrate radiation penetrating spacecraft walls over a rolling operational window.
-2. Lack of Dynamic 3D Spatial Awareness: Generic space weather alerts ('Geomagnetic storm active') fail to dynamically identify which specific satellites in a constellation are crossing high-drag or extreme turbulence corridors in Low Earth Orbit (LEO) or Geostationary Earth Orbit (GEO).
-3. Operational Latency in Emergency Response: Manual decision loops—comprising emergency ground meetings, telecommand drafting, and manual verification—take 30 minutes to several hours. High-energy solar proton flares reach critical intensity in minutes.
-3. Target Users (Personas)
-Persona Name	Role & Domain	Primary Goal	Key Need
-Dr. Vikram Sharma	Gaganyaan Flight Surgeon	Protect Gaganauts from acute radiation sickness during solar proton events.	Needs predictive 6-hour cumulative radiation dose estimates (D in mSv) with actionable triage states.
-Ananya Roy	Satellite Fleet Operations Lead	Monitor orbital fleet health, atmospheric drag, and spatial storm proximity.	Requires a real-time 3D spatial twin of active satellites mapped relative to storm turbulence boundaries.
-Rajesh Kumar	Subsystem Reliability Specialist	Detect early component wear and prevent in-orbit hardware failures.	Needs early anomaly detection on sensor noise and component degradation before irreversible failure occurs.
-4. Vision Statement
-"To pioneer an autonomous, zero-latency space weather defense and asset survivability system that empowers space agencies to protect human lives and multi-billion-dollar satellite constellations through predictive AI, 3D spatial mechanics, and closed-loop command automation."
-5. Key Features & Operational Goals
-Gaganyaan Crew Radiation Shield Engine
-•	LSTM Flux Forecasting: 2-layer LSTM model forecasts 6-hour solar proton flux curves from 24-hour Aditya-L1 observations.
-•	Numerical Dosimetry Integration: Computes cumulative absorbed radiation dose D in milliSieverts (mSv) using Simpson's Composite Rule.
-•	Finite State Machine Triage: GREEN (D < 1.0 mSv - Nominal), YELLOW (1.0 <= D < 10.0 mSv - Elevate monitoring), RED (D >= 10.0 mSv - Critical shelter alert).
-3D Satellite Fleet Hazard Profiler
-•	SGP4 Physics Engine: Propagates TLE parameters into ECEF Cartesian coordinates.
-•	3D Spatial Proximity: Evaluates Euclidean separation distance d from active storm centers.
-Closed-Loop Autonomous Command Generator
-•	Constrained Optimization: Selects optimal recovery maneuvers under power (P_max) and torque (T_max) limits using A* / Integer Linear Programming.
-•	CCSDS JSON & SHA-256 Signing: Synthesizes machine-executable JSON telecommand packets signed with SHA-256 integrity hashes.
-6. Success Metrics & Constraints
-•	Forecast Accuracy: >= 90% accuracy in predicting 6-hour solar proton flux trends.
-•	Execution Latency: Sub-100 millisecond response time for end-to-end processing and command generation.
-•	Command Integrity: 100% validation rate on SHA-256 checksums.
-•	Constraints: Strict adherence to onboard power and torque limits; 5-second manual override safety window.
+> **Target Operations Center:** ISRO Mission Control Center Simulation (ISTRAC / MCF)  
+> **Core Focus:** Real-time space weather defense, crew dosimetry, and sub-100ms autonomous command synthesis.
+
+---
+
+## 📑 1. Vision Document
+
+### Project Name & Overview
+**SPARC-PM** (*Space Priority Alert & Response Command Engine with Predictive Maintenance*) is an autonomous space operations decision-support platform designed to protect orbital assets and crewed space missions from severe space weather threats.
+
+### Problem it Solves
+Space weather events such as Coronal Mass Ejections (CMEs) and Solar Proton Events (SPEs) pose severe threats to orbital hardware and human spaceflight:
+1. **Dosimetry Blind Spots:** Raw proton counts from sensors are not automatically integrated into cumulative absorbed dose curves for flight surgeons.
+2. **Lack of 3D Spatial Awareness:** Generic alerts fail to pinpoint which specific satellites cross high-drag or radiation storm corridors.
+3. **Emergency Response Latency:** Manual ground station workflows take 30+ minutes, while high-energy solar proton flares reach peak intensity in minutes.
+
+### Target Users (Personas)
+| Persona Name | Role & Domain | Primary Operational Goal |
+| :--- | :--- | :--- |
+| **Dr. Vikram Sharma** | Gaganyaan Flight Surgeon | Protect crew members from acute radiation sickness during solar proton events. |
+| **Ananya Roy** | Fleet Operations Lead | Monitor orbital fleet health, atmospheric drag, and 3D storm proximity. |
+| **Rajesh Kumar** | Subsystem Reliability Specialist | Detect early component degradation (CMOS noise, gyro drift, battery decay). |
+
+### Vision Statement
+> *"To pioneer an autonomous, zero-latency space weather defense and asset survivability system that empowers space agencies to protect human lives and multi-billion-dollar satellite constellations through predictive AI, 3D spatial mechanics, and closed-loop command automation."*
+
+### Key Features / Goals
+* **Gaganyaan Crew Dosimetry Engine:** Time-series solar flux forecasting and composite integration for cumulative radiation dose calculation.
+* **3D Satellite Fleet Hazard Profiler:** SGP4 orbital propagation and 3D Euclidean spatial proximity mapping.
+* **Predictive Maintenance Subsystem:** Anomaly detection and failure probability classification for satellite subsystems.
+* **Closed-Loop Command Synthesizer:** Resource-constrained optimization generating telecommand packets signed with SHA-256 hashes.
+
+### Success Metrics
+* **Forecast Accuracy:** $\ge 90\%$ accuracy in predicting 6-hour solar proton flux trends.
+* **Execution Latency:** Sub-100 millisecond response time for end-to-end processing.
+* **Command Integrity:** $100\%$ validation rate on SHA-256 checksums.
+
+### Assumptions & Constraints
+* **Assumptions:** Continuous telemetry availability from solar payload feeds and updated daily Two-Line Element (TLE) satellite data.
+* **Constraints:** Strict adherence to onboard satellite power ($P_{\text{max}}$) and torque ($T_{\text{max}}$) limits; mandatory 10-second manual override safety interlock.
+
+---
+
+## 🌿 2. Branching Strategy (GitHub Flow)
+
+This project strictly follows **GitHub Flow** for software development lifecycle management:
+
+1. **`main` Branch:** Always contains production-ready, deployable code. Direct commits to `main` are restricted.
+2. **Feature Branches (`feature/<feature-name>`):** Created off `main` for developing individual capabilities (e.g., `feature/dev-setup`, `feature/dosimetry-engine`).
+3. **Pull Requests (PRs):** All feature branches undergo verification before being merged back into `main`.
+
+---
+
+## 🛠️ 3. Local Development Tools
+
+| Tool | Purpose | Version / Spec |
+| :--- | :--- | :--- |
+| **Python** | Core computational engine & machine learning models | `3.10+` |
+| **Streamlit** | Interactive Mission Control GUI frontend | `1.30+` |
+| **Docker Desktop** | Containerization runtime environment | `Latest` |
+| **VS Code** | Code editor & integrated terminal | `Latest` |
+| **Git / GitHub** | Version control, issue tracking, and branching | `2.40+` |
+
+---
+
+## 🚀 4. Quick Start – Local Development
+
+### Option A: Local Python Setup
+```bash
+# 1. Clone repository
+git clone [https://github.com/RomilaMukul/SPARC.git](https://github.com/RomilaMukul/SPARC.git)
+cd SPARC
+
+# 2. Create and activate virtual environment
+python -m venv venv
+# On Windows:
+venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run application
+streamlit run src/ui/app.py
