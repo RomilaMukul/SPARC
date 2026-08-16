@@ -36,24 +36,46 @@ FEATURE_COLUMNS = ["aspex_proton_flux", "papa_wind_velocity", "mag_bz_field"]
 SEVERITY_CLASSES = ["Calm", "Watch", "Warning", "Emergency"]
 
 
-def weak_label(row) -> str:
-    """Rule-based bootstrap label. Thresholds are illustrative, based on
-    commonly cited quiet-vs-disturbed solar wind ranges (~300-500 km/s
-    quiet, >600 km/s disturbed) and proton-flux flare-spike behaviour."""
-    flux = row["aspex_proton_flux"]
-    speed = row["papa_wind_velocity"]
-    bz = row["mag_bz_field"]
+def weak_label(df: pd.DataFrame) -> pd.Series:
+    """Percentile-based bootstrap labeling.
 
-    # Emergency: strong southward Bz (geo-effective) + high flux/speed
-    if (bz < -8 and flux > 100) or flux > 500:
-        return "Emergency"
-    # Warning: elevated flux or fast wind stream with southward Bz
-    if flux > 50 or (speed > 550 and bz < -4):
-        return "Warning"
-    # Watch: mild elevation above quiet-Sun baseline
-    if flux > 15 or speed > 480 or bz < -2:
-        return "Watch"
-    return "Calm"
+    We do NOT use fixed thresholds (e.g. "flux > 500") because the real
+    Aditya-L1 ASPEX/SWIS units and scale differ from the synthetic fallback
+    data, and a hardcoded threshold calibrated for one silently mislabels
+    the other. Instead we rank each reading against the *distribution of
+    this dataset itself*: the top ~1% most extreme combined readings become
+    Emergency, the next ~4% Warning, the next ~15% Watch, and the rest Calm.
+    This self-calibrates regardless of whether the data came from real CDF
+    files or the synthetic generator.
+    """
+    flux = df["aspex_proton_flux"]
+    speed = df["papa_wind_velocity"]
+    bz = df["mag_bz_field"]
+
+    # Combine into one "disturbance score": each feature contributes based
+    # on how far it sits from this dataset's own median, in units of its
+    # own spread (a simple per-feature z-score), then summed.
+    def robust_z(s: pd.Series) -> pd.Series:
+        median = s.median()
+        mad = (s - median).abs().median() + 1e-9  # median absolute deviation
+        return (s - median) / mad
+
+    disturbance = robust_z(flux) + robust_z(speed) + robust_z(-bz)  # more negative Bz = more disturbed
+
+    q99 = disturbance.quantile(0.99)
+    q95 = disturbance.quantile(0.95)
+    q80 = disturbance.quantile(0.80)
+
+    def label_for(score):
+        if score >= q99:
+            return "Emergency"
+        if score >= q95:
+            return "Warning"
+        if score >= q80:
+            return "Watch"
+        return "Calm"
+
+    return disturbance.apply(label_for)
 
 
 def build_training_set() -> pd.DataFrame:
@@ -63,7 +85,7 @@ def build_training_set() -> pd.DataFrame:
         )
     df = pd.read_csv(TELEMETRY_INPUT)
     df = df.dropna(subset=FEATURE_COLUMNS)
-    df["severity"] = df.apply(weak_label, axis=1)
+    df["severity"] = weak_label(df)
     return df
 
 
@@ -116,7 +138,7 @@ def get_current_severity() -> dict:
     latest = df.sort_values("timestamp").iloc[-1]
     latest_X = latest[FEATURE_COLUMNS].to_numpy(dtype=float).reshape(1, -1)
     predicted = model.predict(latest_X)[0]
-    probs = dict(zip(model.classes_, model.predict_proba(latest_X)[0].round(3)))
+    probs = {str(cls): float(prob) for cls, prob in zip(model.classes_, model.predict_proba(latest_X)[0].round(3))}
 
     return {
         "timestamp": latest["timestamp"],
