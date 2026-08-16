@@ -18,13 +18,15 @@ OCEANSAT-3
 2 54361  98.1200  95.4500 0001200  45.3000 315.1000 14.85000000120002
 """
 
+
 def fetch_and_process_tle():
     os.makedirs("data/raw", exist_ok=True)
     os.makedirs("data/processed", exist_ok=True)
 
     # Standard browser headers to bypass default requests User-Agent blocking
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
     print("📡 Fetching live TLE parameters from CelesTrak API...")
@@ -32,9 +34,9 @@ def fetch_and_process_tle():
         response = requests.get(CELESTRAK_URL, headers=headers, timeout=10)
         response.raise_for_status()
         raw_text = response.text
-        print("✅ Live connection successful!")
+        print("Live connection successful!")
     except Exception as e:
-        print(f"⚠️ Network connection issue ({e}). Using robust fallback orbital TLE dataset...")
+        print(f"Network connection issue ({e}). Using robust fallback orbital TLE dataset...")
         raw_text = SAMPLE_TLE_DATA
 
     # Save raw TLE file
@@ -47,22 +49,23 @@ def fetch_and_process_tle():
 
     for i in range(0, len(lines) - 2, 3):
         sat_name = lines[i]
-        line1 = lines[i+1]
-        line2 = lines[i+2]
+        line1 = lines[i + 1]
+        line2 = lines[i + 2]
 
         if line1.startswith("1 ") and line2.startswith("2 "):
             satellites.append({
                 "name": sat_name,
                 "norad_id": line1[2:7].strip(),
                 "line1": line1,
-                "line2": line2
+                "line2": line2,
             })
 
     with open(PROCESSED_OUTPUT, "w") as f:
         json.dump(satellites, f, indent=2)
 
-    print(f"✅ Saved raw TLE -> '{RAW_OUTPUT}'")
-    print(f"🎯 Successfully processed {len(satellites)} satellites -> '{PROCESSED_OUTPUT}'")
+    print(f"Saved raw TLE -> '{RAW_OUTPUT}'")
+    print(f"Successfully processed {len(satellites)} satellites -> '{PROCESSED_OUTPUT}'")
+
 
 if __name__ == "__main__":
     fetch_and_process_tle()

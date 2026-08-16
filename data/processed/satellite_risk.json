@@ -1,0 +1,32 @@
+[
+  {
+    "name":"ISS (ZARYA)",
+    "norad_id":"25544",
+    "lat":-46.03,
+    "lon":76.68,
+    "alt_km":265.0,
+    "nearest_corridor":"Southern Auroral Oval",
+    "distance_km":4880.8,
+    "risk_level":"NOMINAL"
+  },
+  {
+    "name":"CARTOSAT-2F",
+    "norad_id":"43111",
+    "lat":79.24,
+    "lon":177.25,
+    "alt_km":545.2,
+    "nearest_corridor":"Northern Auroral Oval",
+    "distance_km":3682.3,
+    "risk_level":"NOMINAL"
+  },
+  {
+    "name":"OCEANSAT-3",
+    "norad_id":"54361",
+    "lat":81.83,
+    "lon":-114.71,
+    "alt_km":626.1,
+    "nearest_corridor":"Northern Auroral Oval",
+    "distance_km":2982.9,
+    "risk_level":"NOMINAL"
+  }
+]
