@@ -6,8 +6,7 @@ import urllib.request
 # =====================================================================
 # CONFIGURATION
 # =====================================================================
-# Replace the raw token with an environment variable fetch
-TOKEN = os.getenv("GITHUB_TOKEN", "YOUR_GITHUB_TOKEN_HERE")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 REPO_OWNER = "RomilaMukul"               
 REPO_NAME = "SPARC"                      
 
@@ -33,7 +32,7 @@ USER_STORIES = [
     },
     {
         "title": "[MUST HAVE] Finite State Machine (FSM) Triage Classification",
-        "body": "As a **Gaganyaan Flight Surgeon**, I want an automated FSM triage system (GREEN, YELLOW, RED) so that crew safety protocols are instantly flagged.\n\n**Acceptance Criteria:**\n- GREEN: $D < 1.0$ mSv (Nominal)\n- YELLOW: $1.0 \le D < 10.0$ mSv (Suspend EVAs)\n- RED: $D \ge 10.0$ mSv (Order crew to storm shelter)",
+        "body": "As a **Gaganyaan Flight Surgeon**, I want an automated FSM triage system (GREEN, YELLOW, RED) so that crew safety protocols are instantly flagged.\n\n**Acceptance Criteria:**\n- GREEN: $D < 1.0$ mSv (Nominal)\n- YELLOW: $1.0 \\le D < 10.0$ mSv (Suspend EVAs)\n- RED: $D \\ge 10.0$ mSv (Order crew to storm shelter)",
         "labels": ["Must Have", "Safety"]
     },
     {
@@ -151,11 +150,24 @@ USER_STORIES = [
 
 def upload_user_stories():
     """Uploads 25 MoSCoW User Stories to GitHub Issues via REST API."""
+    if not GITHUB_TOKEN or GITHUB_TOKEN == "YOUR_GITHUB_TOKEN_HERE":
+        print("❌ Error: GITHUB_TOKEN is not set!")
+        print("\n👉 How to set it:")
+        print("   In PowerShell:")
+        print('     $env:GITHUB_TOKEN="ghp_your_actual_github_token"')
+        print("   In Command Prompt (cmd):")
+        print('     set GITHUB_TOKEN=ghp_your_actual_github_token')
+        print("   In Linux/macOS (bash):")
+        print('     export GITHUB_TOKEN="ghp_your_actual_github_token"')
+        print("\n👉 To generate a token: https://github.com/settings/tokens (select 'repo' scope)")
+        return False
+
     url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues"
     headers = {
         "Authorization": f"token {GITHUB_TOKEN}",
         "Accept": "application/vnd.github.v3+json",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "User-Agent": "SPARC-Automation-Script"
     }
 
     print("=" * 70)
@@ -177,6 +189,15 @@ def upload_user_stories():
                 res = json.loads(response.read().decode())
                 print(f"[{idx}/25] ✅ Issue #{res['number']} Created: {story['title']}")
                 success_count += 1
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode() if hasattr(e, 'read') else str(e)
+            print(f"[{idx}/25] ❌ HTTP Error {e.code} for '{story['title']}': {error_body}")
+            if e.code == 401:
+                print("   ⚠️ Reason: Bad credentials or expired GitHub token.")
+                break
+            elif e.code == 404:
+                print(f"   ⚠️ Reason: Repository '{REPO_OWNER}/{REPO_NAME}' not found or token lacks 'repo' permissions.")
+                break
         except Exception as e:
             print(f"[{idx}/25] ❌ Error creating '{story['title']}': {e}")
             
@@ -186,6 +207,7 @@ def upload_user_stories():
     print(f"🎉 Completed! Successfully published {success_count}/25 User Stories.")
     print(f"🔗 View your issues at: https://github.com/{REPO_OWNER}/{REPO_NAME}/issues")
     print("=" * 70)
+    return True
 
 
 if __name__ == "__main__":
