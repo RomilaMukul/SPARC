@@ -1,16 +1,16 @@
-# 🚀 SPARC-PM: Space Weather Risk Classification & Predictive Maintenance Engine
+# SPARC-PM: Space Weather Risk Classification & Predictive Maintenance Engine
 
 > **Target Operations Center:** ISRO Mission Control Center Simulation (ISTRAC / MCF)  
 > **Core Focus:** Real-time space weather defense, crew dosimetry, and sub-100ms autonomous command synthesis.
 
 ---
 
-## 📑 1. Vision Document
+## 1. Vision Document
 
 ### Project Name & Overview
 **SPARC-PM** (*Space Priority Alert & Response Command Engine with Predictive Maintenance*) is an autonomous space operations decision-support platform designed to protect orbital assets and crewed space missions from severe space weather threats.
 
-### Problem it Solves
+### Problem Statement
 Space weather events such as Coronal Mass Ejections (CMEs) and Solar Proton Events (SPEs) pose severe threats to orbital hardware and human spaceflight:
 1. **Dosimetry Blind Spots:** Raw proton counts from sensors are not automatically integrated into cumulative absorbed dose curves for flight surgeons.
 2. **Lack of 3D Spatial Awareness:** Generic alerts fail to pinpoint which specific satellites cross high-drag or radiation storm corridors.
@@ -19,12 +19,12 @@ Space weather events such as Coronal Mass Ejections (CMEs) and Solar Proton Even
 ### Target Users (Personas)
 | Persona Name | Role & Domain | Primary Operational Goal |
 | :--- | :--- | :--- |
-| **Dr. Vikram Sharma** | Gaganyaan Flight Surgeon | Protect crew members from acute radiation sickness during solar proton events. |
+| **Dr. Vikram Sharma** | Gaganyaan Flight Surgeon | Protect crew members from radiation exposure during solar proton events. |
 | **Ananya Roy** | Fleet Operations Lead | Monitor orbital fleet health, atmospheric drag, and 3D storm proximity. |
 | **Rajesh Kumar** | Subsystem Reliability Specialist | Detect early component degradation (CMOS noise, gyro drift, battery decay). |
 
 ### Vision Statement
-> *"To pioneer an autonomous, zero-latency space weather defense and asset survivability system that empowers space agencies to protect human lives and multi-billion-dollar satellite constellations through predictive AI, 3D spatial mechanics, and closed-loop command automation."*
+> *"To provide an autonomous space weather defense and asset survivability system that enables space agencies to protect astronaut crew members and satellite constellations through predictive modeling, 3D spatial mechanics, and command automation."*
 
 ### Key Features / Goals
 * **Gaganyaan Crew Dosimetry Engine:** Time-series solar flux forecasting and composite integration for cumulative radiation dose calculation.
@@ -43,7 +43,7 @@ Space weather events such as Coronal Mass Ejections (CMEs) and Solar Proton Even
 
 ---
 
-## 🌿 2. Branching Strategy (GitHub Flow)
+## 2. Branching Strategy (GitHub Flow)
 
 This project strictly follows **GitHub Flow** for software development lifecycle management:
 
@@ -53,7 +53,7 @@ This project strictly follows **GitHub Flow** for software development lifecycle
 
 ---
 
-## 🛠️ 3. Local Development Tools
+## 3. Local Development Tools
 
 | Tool | Purpose | Version / Spec |
 | :--- | :--- | :--- |
@@ -65,12 +65,12 @@ This project strictly follows **GitHub Flow** for software development lifecycle
 
 ---
 
-## 🚀 4. Quick Start – Local Development
+## 4. Quick Start – Local Development
 
 ### Option A: Local Python Setup
 ```bash
 # 1. Clone repository
-git clone [https://github.com/RomilaMukul/SPARC.git](https://github.com/RomilaMukul/SPARC.git)
+git clone https://github.com/RomilaMukul/SPARC.git
 cd SPARC
 
 # 2. Create and activate virtual environment
@@ -83,3 +83,4 @@ pip install -r requirements.txt
 
 # 4. Run application
 streamlit run src/ui/app.py
+```

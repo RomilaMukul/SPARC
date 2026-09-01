@@ -29,7 +29,7 @@ def fetch_and_process_tle():
                       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
-    print("📡 Fetching live TLE parameters from CelesTrak API...")
+    print("Fetching live TLE parameters from CelesTrak API...")
     try:
         response = requests.get(CELESTRAK_URL, headers=headers, timeout=10)
         response.raise_for_status()

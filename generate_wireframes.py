@@ -16,7 +16,7 @@ def get_header(title, active_tab_index):
     return f'''
     <!-- Top Header Navigation -->
     <rect x="0" y="0" width="1440" height="70" fill="#0F172A"/>
-    <text x="30" y="42" fill="#F8FAFC" font-family="sans-serif" font-size="18" font-weight="bold">🚀 SPARC-PM | ISRO Mission Control</text>
+    <text x="30" y="42" fill="#F8FAFC" font-family="sans-serif" font-size="18" font-weight="bold">SPARC-PM | ISRO Mission Control</text>
     {tab_xml}
     <rect x="1100" y="20" width="310" height="32" rx="6" fill="#1E293B" stroke="#334155"/>
     <circle cx="1115" cy="36" r="5" fill="#10B981"/>
@@ -30,7 +30,7 @@ def save_svg(filename, content):
     </svg>'''
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(svg_wrapper)
-    print(f"✅ Generated: {filepath}")
+    print(f"[INFO] Generated: {filepath}")
 
 # ==========================================
 # SCREEN 1: EXECUTIVE MISSION OVERVIEW
@@ -95,7 +95,7 @@ s2 = get_header("Dosimetry", 1) + '''
 <!-- Control Panel -->
 <rect x="40" y="720" width="1360" height="140" rx="10" fill="#1E293B" stroke="#334155"/>
 <rect x="70" y="755" width="380" height="70" rx="8" fill="#DC2626"/>
-<text x="110" y="797" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold">🚨 TRIGGER CREW STORM SHELTER ALARM</text>
+<text x="110" y="797" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold">TRIGGER CREW STORM SHELTER ALARM</text>
 '''
 save_svg("02_gaganyaan_dosimetry.svg", s2)
 
@@ -181,14 +181,14 @@ s5 = get_header("Commands", 4) + '''
 <rect x="500" y="90" width="440" height="770" rx="10" fill="#1E293B" stroke="#334155"/>
 <text x="530" y="130" fill="#F8FAFC" font-family="sans-serif" font-size="16" font-weight="bold">Security Verification & Override</text>
 <rect x="530" y="160" width="380" height="60" rx="8" fill="#065F46"/>
-<text x="550" y="195" fill="#FFFFFF" font-family="sans-serif" font-size="14">SHA-256 Checksum Verified 🟢</text>
+<text x="550" y="195" fill="#FFFFFF" font-family="sans-serif" font-size="14">SHA-256 Checksum Verified [VALID]</text>
 
 <circle cx="720" cy="450" r="100" fill="#7F1D1D" stroke="#EF4444" stroke-width="4"/>
 <text x="720" y="445" fill="#FFFFFF" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">00:08</text>
 <text x="720" y="475" fill="#F8FAFC" font-family="sans-serif" font-size="12" text-anchor="middle">COUNTDOWN</text>
 
 <rect x="550" y="620" width="340" height="60" rx="8" fill="#DC2626"/>
-<text x="610" y="656" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold">⛔ ABORT COMMAND</text>
+<text x="610" y="656" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold">ABORT COMMAND</text>
 
 <!-- Right Panel: Audit Trail -->
 <rect x="960" y="90" width="440" height="770" rx="10" fill="#1E293B" stroke="#334155"/>
@@ -220,8 +220,8 @@ s6 = get_header("Reports", 5) + '''
 <text x="70" y="790" fill="#94A3B8" font-family="sans-serif" font-size="13">[X] Include Dosimetry Logs   [X] Include Anomaly Error Charts   [X] Include Cryptographic Hash</text>
 
 <rect x="1000" y="740" width="350" height="60" rx="8" fill="#2563EB"/>
-<text x="1050" y="777" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold">📄 Export Official PDF Report (.pdf)</text>
+<text x="1050" y="777" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold">Export Official PDF Report (.pdf)</text>
 '''
 save_svg("06_incident_analytics.svg", s6)
 
-print("\n🎉 All 6 Wireframe SVG files successfully generated inside 'docs/wireframes/'!")
+print("\nAll 6 Wireframe SVG files generated inside docs/wireframes/")
