@@ -175,12 +175,12 @@ def compute_fleet_risk(severity: str = "Watch") -> pd.DataFrame:
                 "risk_level": risk["risk_level"],
             })
         except Exception as e:
-            print(f"⚠️ Skipping {sat.get('name', '?')}: {e}")
+            print(f"Skipping {sat.get('name', '?')}: {e}")
 
     df = pd.DataFrame(rows)
     os.makedirs(os.path.dirname(RISK_OUTPUT), exist_ok=True)
     df.to_json(RISK_OUTPUT, orient="records", indent=2)
-    print(f"✅ Computed 3D risk for {len(df)} satellites -> '{RISK_OUTPUT}'")
+    print(f"Computed 3D risk for {len(df)} satellites -> '{RISK_OUTPUT}'")
     return df
 
 

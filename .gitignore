@@ -1,11 +1,45 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environment & Virtual Environments
+.env
+.env.*
 venv/
 .venv/
-.env
+env/
+ENV/
+
+# IDE & Editor files
 .vscode/
+.idea/
+*.swp
+*.swo
 .DS_Store
-docs/doc.mddata/processed/*
+
+# Data Directories & Generated Telemetry Datasets
 data/raw/*
-!data/processed/.gitkeep
+data/processed/*
 !data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Trained Model Checkpoints & Binary Weights
+*.pt
+*.pth
+*.joblib
+*.pkl
+*.h5
+*.onnx
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs & Temporary Files
+*.log
+*.tmp
