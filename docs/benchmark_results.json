@@ -1,0 +1,86 @@
+{
+  "timestamp": "2026-09-01T18:25:07Z",
+  "historical_validation": {
+    "accuracy": 0.8,
+    "macro_f1": 0.6666666666666666,
+    "tss": 0.6875,
+    "avg_latency_ms": 23.78,
+    "scenario_details": [
+      {
+        "event": "MAY_2024_G5_SUPER_STORM",
+        "actual_code": 3,
+        "predicted_code": 3,
+        "predicted_label": "G3_SEVERE_STORM",
+        "triage": "RED",
+        "action": "ENTER_STORM_SHELTER_SAFE_MODE",
+        "match": true,
+        "latency_ms": 52.94
+      },
+      {
+        "event": "OCT_2024_G4_CME_IMPACT",
+        "actual_code": 3,
+        "predicted_code": 3,
+        "predicted_label": "G3_SEVERE_STORM",
+        "triage": "RED",
+        "action": "ENTER_STORM_SHELTER_SAFE_MODE",
+        "match": true,
+        "latency_ms": 16.13
+      },
+      {
+        "event": "AUG_2024_MODERATE_CME",
+        "actual_code": 2,
+        "predicted_code": 2,
+        "predicted_label": "G2_MODERATE_STORM",
+        "triage": "YELLOW",
+        "action": "SUSPEND_EVA_CAUTION",
+        "match": true,
+        "latency_ms": 16.39
+      },
+      {
+        "event": "AUG_2024_MINOR_DISTURBANCE",
+        "actual_code": 1,
+        "predicted_code": 0,
+        "predicted_label": "G0_NOMINAL_QUIET",
+        "triage": "GREEN",
+        "action": "NOMINAL_OPERATIONS",
+        "match": false,
+        "latency_ms": 16.95
+      },
+      {
+        "event": "NOMINAL_QUIET_BACKGROUND",
+        "actual_code": 0,
+        "predicted_code": 0,
+        "predicted_label": "G0_NOMINAL_QUIET",
+        "triage": "GREEN",
+        "action": "NOMINAL_OPERATIONS",
+        "match": true,
+        "latency_ms": 16.49
+      }
+    ]
+  },
+  "ablation_study": {
+    "ablation_comparison": [
+      {
+        "architecture": "hist_gb",
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "train_time_s": 3.379,
+        "latency_ms": 0.013
+      },
+      {
+        "architecture": "naive_bayes",
+        "accuracy": 0.926,
+        "macro_f1": 0.8969,
+        "train_time_s": 0.012,
+        "latency_ms": 0.003
+      },
+      {
+        "architecture": "ensemble",
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "train_time_s": 7.831,
+        "latency_ms": 0.105
+      }
+    ]
+  }
+}
