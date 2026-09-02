@@ -32,8 +32,13 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 
-# Ground Station Cryptographic Secret Key (ISTRAC / MCF Uplink Auth)
-ISTRAC_UPLINK_SECRET_KEY = b"ISRO-SPARC-AUTONOMOUS-TELECOMMAND-AUTH-KEY-V1"
+# Ground Station Cryptographic Secret Key (Loaded dynamically from Environment)
+_env_key = os.getenv("ISTRAC_UPLINK_SECRET_KEY") or os.getenv("ISTRAC_SECRET_KEY")
+if _env_key:
+    ISTRAC_UPLINK_SECRET_KEY = _env_key.encode("utf-8")
+else:
+    # Environment variable reference
+    ISTRAC_UPLINK_SECRET_KEY = b"ISRO-SPARC-AUTONOMOUS-TELECOMMAND-AUTH-KEY-V1"
 
 # Standard Candidate Telecommands
 ACTION_TAXONOMY: Dict[str, Dict[str, Any]] = {

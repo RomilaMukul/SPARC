@@ -30,21 +30,34 @@ import pandas as pd
 # Constants
 EARTH_RADIUS_KM = 6378.137
 MU_EARTH = 398600.4418  # km^3 / s^2
-DEFAULT_TLE_PATH = Path(__file__).resolve().parents[2] / "data" / "processed" / "satellites_tle.json"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_TLE_PATH = PROJECT_ROOT / "data" / "processed" / "satellites_tle.json"
+FLEET_CONFIG_PATH = PROJECT_ROOT / "config" / "fleet.json"
 
-# Curated ISRO Active Fleet (50 Satellites / Missions)
-ISRO_FLEET_FALLBACK = [
-    {"name": "GAGANYAAN-1 (CREW SIM)", "norad_id": "99001", "type": "CREW_MODULE", "orbit": "LEO", "altitude_km": 400.0, "inclination": 51.6},
-    {"name": "CARTOSAT-3", "norad_id": "44804", "type": "EARTH_OBSERVATION", "orbit": "SSO", "altitude_km": 505.0, "inclination": 97.5},
-    {"name": "OCEANSAT-3 (EOS-06)", "norad_id": "54361", "type": "OCEANOGRAPHY", "orbit": "SSO", "altitude_km": 720.0, "inclination": 98.1},
-    {"name": "RISAT-2BR1", "norad_id": "44857", "type": "RADAR_IMAGING", "orbit": "LEO", "altitude_km": 576.0, "inclination": 37.0},
-    {"name": "EOS-04 (RISAT-1A)", "norad_id": "51656", "type": "RADAR_IMAGING", "orbit": "SSO", "altitude_km": 529.0, "inclination": 97.5},
-    {"name": "NAVIC-1I (IRNSS-1I)", "norad_id": "43286", "type": "NAVIGATION", "orbit": "GEO_GSO", "altitude_km": 35786.0, "inclination": 29.0},
-    {"name": "NAVIC-1B (IRNSS-1B)", "norad_id": "39635", "type": "NAVIGATION", "orbit": "GEO_GSO", "altitude_km": 35786.0, "inclination": 29.2},
-    {"name": "GSAT-24", "norad_id": "52899", "type": "COMMUNICATION", "orbit": "GEO", "altitude_km": 35786.0, "inclination": 0.05},
-    {"name": "INSAT-3DR", "norad_id": "41752", "type": "METEOROLOGY", "orbit": "GEO", "altitude_km": 35786.0, "inclination": 0.08},
-    {"name": "CHANDRAYAAN-2 ORBITER", "norad_id": "44441", "type": "LUNAR", "orbit": "HEO_LUNAR", "altitude_km": 100000.0, "inclination": 90.0},
-]
+
+def load_fleet_config() -> List[Dict[str, Any]]:
+    """Loads active ISRO fleet configuration dynamically from config/fleet.json."""
+    if FLEET_CONFIG_PATH.exists():
+        try:
+            with open(FLEET_CONFIG_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data.get("satellites", [])
+        except Exception:
+            pass
+    return [
+        {"name": "GAGANYAAN-1 (CREW SIM)", "norad_id": "99001", "type": "CREW_MODULE", "orbit": "LEO", "altitude_km": 400.0, "inclination": 51.6},
+        {"name": "CARTOSAT-3", "norad_id": "44804", "type": "EARTH_OBSERVATION", "orbit": "SSO", "altitude_km": 505.0, "inclination": 97.5},
+        {"name": "OCEANSAT-3 (EOS-06)", "norad_id": "54361", "type": "OCEANOGRAPHY", "orbit": "SSO", "altitude_km": 720.0, "inclination": 98.1},
+        {"name": "RISAT-2BR1", "norad_id": "44857", "type": "RADAR_IMAGING", "orbit": "LEO", "altitude_km": 576.0, "inclination": 37.0},
+        {"name": "EOS-04 (RISAT-1A)", "norad_id": "51656", "type": "RADAR_IMAGING", "orbit": "SSO", "altitude_km": 529.0, "inclination": 97.5},
+        {"name": "NAVIC-1I (IRNSS-1I)", "norad_id": "43286", "type": "NAVIGATION", "orbit": "GEO_GSO", "altitude_km": 35786.0, "inclination": 29.0},
+        {"name": "NAVIC-1B (IRNSS-1B)", "norad_id": "39635", "type": "NAVIGATION", "orbit": "GEO_GSO", "altitude_km": 35786.0, "inclination": 29.2},
+        {"name": "GSAT-24", "norad_id": "52899", "type": "COMMUNICATION", "orbit": "GEO", "altitude_km": 35786.0, "inclination": 0.05},
+        {"name": "INSAT-3DR", "norad_id": "41752", "type": "METEOROLOGY", "orbit": "GEO", "altitude_km": 35786.0, "inclination": 0.08},
+        {"name": "CHANDRAYAAN-2 ORBITER", "norad_id": "44441", "type": "LUNAR", "orbit": "HEO_LUNAR", "altitude_km": 100000.0, "inclination": 90.0},
+    ]
+
+ISRO_FLEET_FALLBACK = load_fleet_config()
 
 
 def calculate_gst_rad(dt: datetime) -> float:
