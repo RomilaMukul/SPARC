@@ -192,6 +192,36 @@ class PredictiveMaintenanceEngine:
             p_fail = 1.0 / (1.0 + math.exp(-np.clip(z, -6.0, 6.0)))
             return round(p_fail, 4)
 
+    def evaluate_single_satellite(
+        self, sat_id: str, sensor_telemetry: Dict[str, float]
+    ) -> Dict[str, Any]:
+        """
+        Evaluates 72-hour failure probability for a single satellite telemetry snapshot.
+        """
+        v_bat = float(sensor_telemetry.get("bus_voltage_v", sensor_telemetry.get("battery_voltage", 28.0)))
+        temp = float(sensor_telemetry.get("temp_c", sensor_telemetry.get("subsystem_temp_c", 25.0)))
+        gyro = float(sensor_telemetry.get("gyro_drift_deg_h", sensor_telemetry.get("gyro_drift_deg_hr", 0.15)))
+        dosimeter = float(sensor_telemetry.get("dosimeter_count", 30.0))
+        storm = float(sensor_telemetry.get("storm_severity", 1.0))
+
+        single_row = [v_bat, temp, gyro, dosimeter, storm]
+        window = np.tile(single_row, (24, 1))
+
+        p_fail = self.predict_p_fail(window)
+        if temp > 60.0 or v_bat < 24.0 or gyro > 0.35:
+            p_fail = max(p_fail, 0.15)
+
+        health_status = "ELEVATED_RISK" if p_fail >= 0.40 else ("MODERATE_WEAR" if p_fail >= 0.15 else "OPTIMAL_HEALTH")
+        return {
+            "sat_id": sat_id,
+            "p_fail_72h": p_fail,
+            "health_status": health_status,
+        }
+
+    def diagnose_fleet(self) -> List[Dict[str, Any]]:
+        """Alias for evaluate_fleet_telemetry for test compatibility."""
+        return self.evaluate_fleet_telemetry()
+
     def evaluate_fleet_telemetry(
         self, fleet_df: Optional[pd.DataFrame] = None
     ) -> List[Dict[str, Any]]:

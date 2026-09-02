@@ -115,6 +115,52 @@ class CrewDosimetryEngine:
             else:
                 self.model.eval()
 
+    def calculate_absorbed_dose(
+        self, proton_flux: float, shielding_g_cm2: float = 3.5, solar_wind_speed_kms: float = 450.0
+    ) -> float:
+        """
+        Calculates absorbed dose rate given arbitrary shielding density (g/cm²).
+        Attenuates linearly/exponentially with shielding thickness.
+        """
+        attenuation = max(0.01, 1.0 - (shielding_g_cm2 - 1.0) * 0.25) if shielding_g_cm2 > 1.0 else 1.0 / max(0.1, shielding_g_cm2)
+        base_rate = self.calculate_instantaneous_dose_rate(proton_flux, solar_wind_speed_kms)
+        return float(round(base_rate * attenuation, 4))
+
+    def predict_dosimetry(
+        self,
+        current_proton_flux: float,
+        kp_index: float = 1.0,
+        solar_wind_speed: float = 450.0,
+        bz_field: float = 0.0,
+    ) -> Dict[str, Any]:
+        """
+        Convenience wrapper returning dosimetry dict compliant with unit tests and pipeline callers.
+        """
+        historical_flux = [max(0.1, float(current_proton_flux))] * 60
+        forecast = self.forecast_6h_radiation_curve(
+            historical_flux_60m=historical_flux,
+            current_wind_speed=solar_wind_speed,
+            current_bz=bz_field,
+        )
+
+        if current_proton_flux >= 1000.0 or forecast["alert_color"] == "RED":
+            eva_status = "CRITICAL_SUSPEND"
+            safety_tier = "CRITICAL"
+        elif forecast["alert_color"] == "YELLOW":
+            eva_status = "EVA_SUSPENDED"
+            safety_tier = "WARNING"
+        else:
+            eva_status = "SAFE_NOMINAL"
+            safety_tier = "GREEN"
+
+        return {
+            "predicted_6h_accumulated_dose_msv": forecast["total_6h_dose_msv"],
+            "peak_dose_rate_usv_hr": forecast["peak_dose_rate_usv_hr"],
+            "eva_status": eva_status,
+            "safety_tier": safety_tier,
+            "forecast_details": forecast,
+        }
+
     def calculate_instantaneous_dose_rate(
         self, proton_flux_pfu: float, solar_wind_speed_kms: float = 450.0
     ) -> float:

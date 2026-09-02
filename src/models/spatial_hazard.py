@@ -327,6 +327,7 @@ class SpatialHazardEngine:
             "storm_corridor_radius_km": round(r_storm_km, 1),
             "storm_center_ecef": storm_center_ecef.tolist(),
             "total_satellites": len(evaluated_fleet),
+            "active_satellites_count": len(evaluated_fleet),
             "critical_count": critical_count,
             "warning_count": warning_count,
             "elevated_count": elevated_count,

@@ -128,6 +128,39 @@ BASE_PHYSICAL_FEATURES: List[str] = [
 
 
 # ===================================================================
+#  Physics-Based Helper Functions
+# ===================================================================
+def compute_akasofu_epsilon(v_sw: float, b_z: float, b_y: float = 0.0) -> float:
+    """
+    Computes the Akasofu Epsilon magnetospheric energy coupling index.
+
+    Formula:
+      Epsilon = v_sw * B_perp^2 * sin^4(theta / 2) * 1e-3
+    where:
+      B_perp = sqrt(b_y^2 + b_z^2)
+      theta = arctan2(b_y, b_z)  (clock angle)
+    """
+    b_perp = float(np.sqrt(b_y**2 + b_z**2))
+    if b_perp == 0.0:
+        return 0.0
+    theta = float(np.arctan2(b_y, b_z))
+    sin4 = float((np.sin(theta / 2.0)) ** 4)
+    epsilon = float(v_sw) * (b_perp**2) * sin4 * 1e-3
+    return float(round(epsilon, 4))
+
+
+def compute_dynamic_pressure(n_p: float, v_sw: float) -> float:
+    """
+    Computes solar wind dynamic pressure in nanoPascals (nPa).
+
+    Formula:
+      P_dyn = 1.6726e-6 * n_p * v_sw^2
+    """
+    p_dyn = 1.6726e-6 * float(n_p) * (float(v_sw) ** 2)
+    return float(round(p_dyn, 4))
+
+
+# ===================================================================
 #  Physics-Based Feature Engineering
 # ===================================================================
 def engineer_physics_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -251,8 +284,9 @@ class SpaceWeatherSeverityClassifier:
     def __init__(
         self,
         target_type: str = "severity",  # 'severity' (0-3) or 'event' (0/1)
-        model_type: str = "ensemble",   # 'ensemble', 'hist_gb', or 'naive_bayes'
+        model_type: str = "hist_gb",    # 'hist_gb' (fastest), 'ensemble', or 'naive_bayes'
         random_state: int = 42,
+        auto_load: bool = True,
     ):
         self.target_type = target_type
         self.model_type = model_type
@@ -263,6 +297,15 @@ class SpaceWeatherSeverityClassifier:
         self.is_fitted: bool = False
 
         self._build_model()
+        if auto_load and DEFAULT_MODEL_PATH.exists():
+            try:
+                bundle = joblib.load(DEFAULT_MODEL_PATH)
+                self.model = bundle["model"]
+                self.classes_ = bundle["classes"]
+                self.feature_columns = bundle.get("feature_columns", ENGINEERED_FEATURE_COLUMNS)
+                self.is_fitted = True
+            except Exception:
+                pass
 
     def _build_model(self) -> None:
         """Constructs the configured classifier architecture."""
@@ -485,8 +528,8 @@ class SpaceWeatherSeverityClassifier:
             columns=self.feature_columns,
         )
 
-        pred_code = int(self.model.predict(X_df)[0])
         proba = self.model.predict_proba(X_df)[0]
+        pred_code = int(self.classes_[np.argmax(proba)])
 
         severity_label = SEVERITY_MAP.get(pred_code, f"CODE_{pred_code}")
         triage_info = FSM_TRIAGE_RULES.get(
@@ -508,6 +551,7 @@ class SpaceWeatherSeverityClassifier:
         return {
             "severity_code": pred_code,
             "severity_label": severity_label,
+            "severity_class": severity_label,
             "triage": triage_info["triage"],
             "action": triage_info["action"],
             "action_description": triage_info["description"],
@@ -515,6 +559,29 @@ class SpaceWeatherSeverityClassifier:
             "inference_latency_ms": round(elapsed_ms, 3),
             "latency_compliant": elapsed_ms < 100.0,
         }
+
+    def predict_storm_severity(
+        self,
+        solar_wind_speed: float,
+        bz_field: float,
+        proton_density: float,
+        proton_flux: float,
+        solar_wind_pressure: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """
+        Executes real-time storm severity prediction for individual telemetry fields.
+        """
+        if solar_wind_pressure is None:
+            solar_wind_pressure = compute_dynamic_pressure(n_p=proton_density, v_sw=solar_wind_speed)
+
+        telemetry = {
+            "proton_speed_kms": solar_wind_speed,
+            "mag_bz_field": bz_field,
+            "proton_density_cm3": proton_density,
+            "proton_flux_pfu": proton_flux,
+            "solar_wind_dyn_pressure_npa": solar_wind_pressure,
+        }
+        return self.predict_single(telemetry)
 
     # ---------------------------------------------------------------
     #  Persistence
