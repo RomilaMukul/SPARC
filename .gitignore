@@ -1,10 +1,60 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
+
+# Virtual environments
 venv/
 .venv/
-.env
-.vscode/
-.DS_Store
-.claude/
-~$*.docx
+env/
+ENV/
+env.bak/
+venv.bak/
 
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+.streamlit/secrets.toml
+
+# Data Directories & Generated Telemetry Caches
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# PyTorch / Deep Learning Heavy Checkpoints
+*.pt
+*.pth
+*.bin
+*.onnx
+*.h5
+*.ckpt
+
+# IDEs, Editors & Operating System Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+.claude/
+.gemini/
+
+# Office & Temporary Files
+~$*.docx
+~$*.xlsx
+*.tmp
+*.log
+
+# Pytest / Coverage / Linting
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
