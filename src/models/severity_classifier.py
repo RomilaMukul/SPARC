@@ -48,6 +48,10 @@ import sys
 import time
 import warnings
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import joblib
@@ -654,14 +658,9 @@ def main() -> None:
 
     # 1. Load Dataset
     csv_path = DEFAULT_DATASET
-    if not csv_path.exists():
-        print(f"[ERROR] Processed telemetry file not found: {csv_path}")
-        print("        Running preprocessor first...")
-        import subprocess
-        subprocess.run([sys.executable, "src/data/preprocessor.py"], check=True)
-
+    from src.data.download_hf_dataset import load_sparc_dataframe
+    df = load_sparc_dataframe(csv_path)
     print(f"[LOAD] Ingesting dataset: {csv_path}")
-    df = pd.read_csv(csv_path)
     print(f"       Records: {len(df):,} | Attributes: {len(df.columns)}")
 
     # 2. Audit label leakage

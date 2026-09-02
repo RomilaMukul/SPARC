@@ -79,11 +79,8 @@ def weak_label(df: pd.DataFrame) -> pd.Series:
 
 
 def build_training_set() -> pd.DataFrame:
-    if not os.path.exists(TELEMETRY_INPUT):
-        raise FileNotFoundError(
-            f"'{TELEMETRY_INPUT}' not found. Run parse_aditya.py first."
-        )
-    df = pd.read_csv(TELEMETRY_INPUT)
+    from src.data.download_hf_dataset import load_sparc_dataframe
+    df = load_sparc_dataframe(TELEMETRY_INPUT)
     df = df.dropna(subset=FEATURE_COLUMNS)
     df["severity"] = weak_label(df)
     return df
