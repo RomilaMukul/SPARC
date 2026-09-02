@@ -36,6 +36,14 @@ Key Capabilities:
 from __future__ import annotations
 
 import os
+
+# Limit OpenMP/BLAS thread overhead to optimize single-sample inference latency (< 50ms requirement)
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 import sys
 import time
 import warnings
@@ -304,6 +312,18 @@ class SpaceWeatherSeverityClassifier:
                 self.classes_ = bundle["classes"]
                 self.feature_columns = bundle.get("feature_columns", ENGINEERED_FEATURE_COLUMNS)
                 self.is_fitted = True
+
+                # Disable thread pool overhead for single sample predictions
+                if hasattr(self.model, "n_jobs"):
+                    self.model.n_jobs = 1
+                if hasattr(self.model, "estimators_"):
+                    for est in self.model.estimators_:
+                        if hasattr(est, "n_jobs"):
+                            est.n_jobs = 1
+                        if hasattr(est, "named_steps"):
+                            for step in est.named_steps.values():
+                                if hasattr(step, "n_jobs"):
+                                    step.n_jobs = 1
             except Exception:
                 pass
 
@@ -325,7 +345,7 @@ class SpaceWeatherSeverityClassifier:
                 max_depth=10,
                 min_samples_leaf=4,
                 class_weight="balanced",
-                n_jobs=-1,
+                n_jobs=1,
                 random_state=self.random_state,
             )),
         ])
@@ -348,7 +368,7 @@ class SpaceWeatherSeverityClassifier:
                 ],
                 voting="soft",
                 weights=[3, 2, 1],
-                n_jobs=-1,
+                n_jobs=1,
             )
 
     # ---------------------------------------------------------------
