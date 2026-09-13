@@ -45,17 +45,88 @@ def load_fleet_config() -> List[Dict[str, Any]]:
         except Exception:
             pass
     return [
-        {"name": "GAGANYAAN-1 (CREW SIM)", "norad_id": "99001", "type": "CREW_MODULE", "orbit": "LEO", "altitude_km": 400.0, "inclination": 51.6},
-        {"name": "CARTOSAT-3", "norad_id": "44804", "type": "EARTH_OBSERVATION", "orbit": "SSO", "altitude_km": 505.0, "inclination": 97.5},
-        {"name": "OCEANSAT-3 (EOS-06)", "norad_id": "54361", "type": "OCEANOGRAPHY", "orbit": "SSO", "altitude_km": 720.0, "inclination": 98.1},
-        {"name": "RISAT-2BR1", "norad_id": "44857", "type": "RADAR_IMAGING", "orbit": "LEO", "altitude_km": 576.0, "inclination": 37.0},
-        {"name": "EOS-04 (RISAT-1A)", "norad_id": "51656", "type": "RADAR_IMAGING", "orbit": "SSO", "altitude_km": 529.0, "inclination": 97.5},
-        {"name": "NAVIC-1I (IRNSS-1I)", "norad_id": "43286", "type": "NAVIGATION", "orbit": "GEO_GSO", "altitude_km": 35786.0, "inclination": 29.0},
-        {"name": "NAVIC-1B (IRNSS-1B)", "norad_id": "39635", "type": "NAVIGATION", "orbit": "GEO_GSO", "altitude_km": 35786.0, "inclination": 29.2},
-        {"name": "GSAT-24", "norad_id": "52899", "type": "COMMUNICATION", "orbit": "GEO", "altitude_km": 35786.0, "inclination": 0.05},
-        {"name": "INSAT-3DR", "norad_id": "41752", "type": "METEOROLOGY", "orbit": "GEO", "altitude_km": 35786.0, "inclination": 0.08},
-        {"name": "CHANDRAYAAN-2 ORBITER", "norad_id": "44441", "type": "LUNAR", "orbit": "HEO_LUNAR", "altitude_km": 100000.0, "inclination": 90.0},
+        {
+            "name": "GAGANYAAN-1 (CREW SIM)",
+            "norad_id": "99001",
+            "type": "CREW_MODULE",
+            "orbit": "LEO",
+            "altitude_km": 400.0,
+            "inclination": 51.6,
+        },
+        {
+            "name": "CARTOSAT-3",
+            "norad_id": "44804",
+            "type": "EARTH_OBSERVATION",
+            "orbit": "SSO",
+            "altitude_km": 505.0,
+            "inclination": 97.5,
+        },
+        {
+            "name": "OCEANSAT-3 (EOS-06)",
+            "norad_id": "54361",
+            "type": "OCEANOGRAPHY",
+            "orbit": "SSO",
+            "altitude_km": 720.0,
+            "inclination": 98.1,
+        },
+        {
+            "name": "RISAT-2BR1",
+            "norad_id": "44857",
+            "type": "RADAR_IMAGING",
+            "orbit": "LEO",
+            "altitude_km": 576.0,
+            "inclination": 37.0,
+        },
+        {
+            "name": "EOS-04 (RISAT-1A)",
+            "norad_id": "51656",
+            "type": "RADAR_IMAGING",
+            "orbit": "SSO",
+            "altitude_km": 529.0,
+            "inclination": 97.5,
+        },
+        {
+            "name": "NAVIC-1I (IRNSS-1I)",
+            "norad_id": "43286",
+            "type": "NAVIGATION",
+            "orbit": "GEO_GSO",
+            "altitude_km": 35786.0,
+            "inclination": 29.0,
+        },
+        {
+            "name": "NAVIC-1B (IRNSS-1B)",
+            "norad_id": "39635",
+            "type": "NAVIGATION",
+            "orbit": "GEO_GSO",
+            "altitude_km": 35786.0,
+            "inclination": 29.2,
+        },
+        {
+            "name": "GSAT-24",
+            "norad_id": "52899",
+            "type": "COMMUNICATION",
+            "orbit": "GEO",
+            "altitude_km": 35786.0,
+            "inclination": 0.05,
+        },
+        {
+            "name": "INSAT-3DR",
+            "norad_id": "41752",
+            "type": "METEOROLOGY",
+            "orbit": "GEO",
+            "altitude_km": 35786.0,
+            "inclination": 0.08,
+        },
+        {
+            "name": "CHANDRAYAAN-2 ORBITER",
+            "norad_id": "44441",
+            "type": "LUNAR",
+            "orbit": "HEO_LUNAR",
+            "altitude_km": 100000.0,
+            "inclination": 90.0,
+        },
     ]
+
 
 ISRO_FLEET_FALLBACK = load_fleet_config()
 
@@ -69,7 +140,10 @@ def calculate_gst_rad(dt: datetime) -> float:
 
     year = utc_dt.year
     month = utc_dt.month
-    day = utc_dt.day + (utc_dt.hour + (utc_dt.minute + utc_dt.second / 60.0) / 60.0) / 24.0
+    day = (
+        utc_dt.day
+        + (utc_dt.hour + (utc_dt.minute + utc_dt.second / 60.0) / 60.0) / 24.0
+    )
 
     if month <= 2:
         year -= 1
@@ -77,7 +151,13 @@ def calculate_gst_rad(dt: datetime) -> float:
 
     A = math.floor(year / 100)
     B = 2 - A + math.floor(A / 4)
-    jd = math.floor(365.25 * (year + 4716)) + math.floor(30.6001 * (month + 1)) + day + B - 1524.5
+    jd = (
+        math.floor(365.25 * (year + 4716))
+        + math.floor(30.6001 * (month + 1))
+        + day
+        + B
+        - 1524.5
+    )
 
     d = jd - 2451545.0  # Days since J2000.0
     # GMST in hours
@@ -92,11 +172,7 @@ def eci_to_ecef(r_eci: np.ndarray, gst_rad: float) -> np.ndarray:
     cos_t = math.cos(gst_rad)
     sin_t = math.sin(gst_rad)
     # Rotation around Z-axis
-    R_z = np.array([
-        [cos_t, sin_t, 0.0],
-        [-sin_t, cos_t, 0.0],
-        [0.0, 0.0, 1.0]
-    ])
+    R_z = np.array([[cos_t, sin_t, 0.0], [-sin_t, cos_t, 0.0], [0.0, 0.0, 1.0]])
     return np.dot(R_z, r_eci)
 
 
@@ -122,21 +198,27 @@ class SpatialHazardEngine:
     Integrates SGP4 orbital mechanics with solar storm corridor geometric envelopes.
     """
 
-    def __init__(self, tle_source: Optional[Union[str, Path, List[Dict[str, Any]]]] = None):
+    def __init__(
+        self, tle_source: Optional[Union[str, Path, List[Dict[str, Any]]]] = None
+    ):
         self.satellites: List[Dict[str, Any]] = []
         self._load_tle_database(tle_source)
 
-    def _load_tle_database(self, source: Optional[Union[str, Path, List[Dict[str, Any]]]] = None) -> None:
+    def _load_tle_database(
+        self, source: Optional[Union[str, Path, List[Dict[str, Any]]]] = None
+    ) -> None:
         """Loads TLE data from JSON or initializes 50-satellite representative ISRO fleet."""
         loaded = False
-        target_path = Path(source) if isinstance(source, (str, Path)) else DEFAULT_TLE_PATH
+        target_path = (
+            Path(source) if isinstance(source, (str, Path)) else DEFAULT_TLE_PATH
+        )
 
         if target_path and target_path.exists():
             try:
                 with open(target_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     if isinstance(data, list) and len(data) > 0:
-                        self.satellites = data
+                        self.satellites = self._enrich_with_orbit_info(data)
                         loaded = True
             except Exception as e:
                 print(f"[WARN] Could not load TLE JSON ({e}). Utilizing fleet builder.")
@@ -144,6 +226,36 @@ class SpatialHazardEngine:
         if not loaded:
             # Build representative 50-satellite fleet across diverse orbits
             self.satellites = self._build_synthetic_isro_fleet(50)
+
+    def _enrich_with_orbit_info(
+        self, satellites: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """Merges orbit type info from fleet config into TLE satellite entries."""
+        fleet_config = load_fleet_config()
+        config_map: Dict[str, Dict[str, Any]] = {}
+        for sat in fleet_config:
+            name_key = sat.get("name", "").split("(")[0].strip().upper()
+            config_map[name_key] = sat
+
+        enriched = []
+        for sat in satellites:
+            name = sat.get("name", sat.get("sat_id", "")).upper()
+            sat_entry = dict(sat)
+            # Find matching config entry by partial name match
+            matched = False
+            for config_key, config_sat in config_map.items():
+                if config_key in name:
+                    sat_entry["orbit_type"] = config_sat.get("orbit", "LEO")
+                    sat_entry["altitude_km"] = config_sat.get("altitude_km", 600.0)
+                    sat_entry["criticality_weight"] = config_sat.get("criticality", 0.5)
+                    matched = True
+                    break
+            if not matched:
+                sat_entry["orbit_type"] = self._infer_orbit(sat)
+                sat_entry["altitude_km"] = sat.get("altitude_km", 600.0)
+                sat_entry["criticality_weight"] = 0.5
+            enriched.append(sat_entry)
+        return enriched
 
     def _build_synthetic_isro_fleet(self, count: int = 50) -> List[Dict[str, Any]]:
         """Synthesizes a 50-satellite constellation representing ISRO's operational profile."""
@@ -162,24 +274,28 @@ class SpatialHazardEngine:
         ]
 
         for i in range(1, count + 1):
-            proto_name, base_alt, inc, o_type, crit = orbit_profiles[(i - 1) % len(orbit_profiles)]
+            proto_name, base_alt, inc, o_type, crit = orbit_profiles[
+                (i - 1) % len(orbit_profiles)
+            ]
             sat_id = f"ISRO-{i:03d}"
             name = f"{proto_name}-{i:02d}"
-            raan = ((i * 37.5) % 360.0)
-            mean_anom = ((i * 53.2) % 360.0)
+            raan = (i * 37.5) % 360.0
+            mean_anom = (i * 53.2) % 360.0
 
-            fleet.append({
-                "sat_id": sat_id,
-                "name": name,
-                "norad_id": str(90000 + i),
-                "orbit_type": o_type,
-                "altitude_km": base_alt + ((i % 5) * 15.0),
-                "inclination_deg": inc,
-                "raan_deg": raan,
-                "mean_anomaly_deg": mean_anom,
-                "eccentricity": 0.0012 if base_alt < 2000 else 0.0002,
-                "criticality_weight": crit,
-            })
+            fleet.append(
+                {
+                    "sat_id": sat_id,
+                    "name": name,
+                    "norad_id": str(90000 + i),
+                    "orbit_type": o_type,
+                    "altitude_km": base_alt + ((i % 5) * 15.0),
+                    "inclination_deg": inc,
+                    "raan_deg": raan,
+                    "mean_anomaly_deg": mean_anom,
+                    "eccentricity": 0.0012 if base_alt < 2000 else 0.0002,
+                    "criticality_weight": crit,
+                }
+            )
         return fleet
 
     def propagate_single(
@@ -212,8 +328,12 @@ class SpatialHazardEngine:
         y_orb = a_km * math.sin(M_rad)
 
         # Rotate to ECI (TEME) frame
-        x_eci = (math.cos(raan_rad) * x_orb) - (math.sin(raan_rad) * y_orb * math.cos(inc_rad))
-        y_eci = (math.sin(raan_rad) * x_orb) + (math.cos(raan_rad) * y_orb * math.cos(inc_rad))
+        x_eci = (math.cos(raan_rad) * x_orb) - (
+            math.sin(raan_rad) * y_orb * math.cos(inc_rad)
+        )
+        y_eci = (math.sin(raan_rad) * x_orb) + (
+            math.cos(raan_rad) * y_orb * math.cos(inc_rad)
+        )
         z_eci = y_orb * math.sin(inc_rad)
 
         r_eci = np.array([x_eci, y_eci, z_eci])
@@ -222,8 +342,12 @@ class SpatialHazardEngine:
         v_mag = math.sqrt(MU_EARTH / a_km)
         vx_orb = -v_mag * math.sin(M_rad)
         vy_orb = v_mag * math.cos(M_rad)
-        vx_eci = (math.cos(raan_rad) * vx_orb) - (math.sin(raan_rad) * vy_orb * math.cos(inc_rad))
-        vy_eci = (math.sin(raan_rad) * vx_orb) + (math.cos(raan_rad) * vy_orb * math.cos(inc_rad))
+        vx_eci = (math.cos(raan_rad) * vx_orb) - (
+            math.sin(raan_rad) * vy_orb * math.cos(inc_rad)
+        )
+        vy_eci = (math.sin(raan_rad) * vx_orb) + (
+            math.cos(raan_rad) * vy_orb * math.cos(inc_rad)
+        )
         vz_eci = vy_orb * math.sin(inc_rad)
         v_eci = np.array([vx_eci, vy_eci, vz_eci])
 
@@ -278,10 +402,12 @@ class SpatialHazardEngine:
         bz_factor = 1.0 + max(0.0, -bz_field_nt) / 10.0
         flux_factor = 1.0 + math.log10(max(1.0, proton_flux_pfu)) / 4.0
 
-        r_storm_km = base_corridor_radius_km * (v_factor ** 0.5) * bz_factor * flux_factor
+        r_storm_km = base_corridor_radius_km * (v_factor**0.5) * bz_factor * flux_factor
 
         # Storm front center vector (Sun-Earth L1 line offset)
-        dir_norm = np.array(storm_origin_direction) / (np.linalg.norm(storm_origin_direction) + 1e-6)
+        dir_norm = np.array(storm_origin_direction) / (
+            np.linalg.norm(storm_origin_direction) + 1e-6
+        )
         storm_center_ecef = dir_norm * (EARTH_RADIUS_KM + 35000.0)
 
         evaluated_fleet: List[Dict[str, Any]] = []
@@ -311,13 +437,21 @@ class SpatialHazardEngine:
             else:
                 alert_level = "NOMINAL"
 
-            evaluated_fleet.append({
-                **sat,
-                "dist_to_storm_km": round(dist_km, 1),
-                "hazard_ratio": hazard_score,
-                "alert_level": alert_level,
-                "time_to_corridor_sec": round(max(0.0, (dist_km - r_storm_km * 0.5) / max(1.0, sat["speed_kms"])), 1),
-            })
+            evaluated_fleet.append(
+                {
+                    **sat,
+                    "dist_to_storm_km": round(dist_km, 1),
+                    "hazard_ratio": hazard_score,
+                    "alert_level": alert_level,
+                    "time_to_corridor_sec": round(
+                        max(
+                            0.0,
+                            (dist_km - r_storm_km * 0.5) / max(1.0, sat["speed_kms"]),
+                        ),
+                        1,
+                    ),
+                }
+            )
 
         # Sort fleet by highest hazard ratio first
         evaluated_fleet.sort(key=lambda x: x["hazard_ratio"], reverse=True)
@@ -331,9 +465,57 @@ class SpatialHazardEngine:
             "critical_count": critical_count,
             "warning_count": warning_count,
             "elevated_count": elevated_count,
-            "nominal_count": len(evaluated_fleet) - (critical_count + warning_count + elevated_count),
+            "nominal_count": len(evaluated_fleet)
+            - (critical_count + warning_count + elevated_count),
             "fleet_hazard_profile": evaluated_fleet,
         }
+
+    def filter_by_constellation(self, constellation: str) -> List[Dict[str, Any]]:
+        """
+        Filters the satellite fleet by orbit regime or constellation name.
+
+        Args:
+            constellation: Orbit type or partial name to match.
+                           Options: LEO, SSO, GEO, GEO_GSO, HEO, HEO_LUNAR,
+                                    or specific name like "GAGANYAAN", "CARTOSAT", "NAVIC".
+
+        Returns:
+            Filtered list of satellite dictionaries matching the constellation.
+        """
+        constellation_upper = constellation.upper()
+        filtered = []
+        for sat in self.satellites:
+            orbit = sat.get("orbit_type", sat.get("orbit", "")).upper()
+            name = sat.get("name", sat.get("sat_id", "")).upper()
+            if not orbit or orbit == "UNKNOWN":
+                orbit = self._infer_orbit(sat)
+            if constellation_upper in orbit or constellation_upper in name:
+                filtered.append(sat)
+        return filtered
+
+    def _infer_orbit(self, sat: Dict[str, Any]) -> str:
+        """Infers orbit type from altitude or name."""
+        alt = sat.get("altitude_km", 0.0)
+        name = sat.get("name", sat.get("sat_id", "")).upper()
+        if "GAGANYAAN" in name or "CREW" in name or alt < 2000:
+            return "LEO"
+        elif "NAVIC" in name or "NAVIGATION" in name:
+            return "GEO_GSO"
+        elif alt >= 35000:
+            return "GEO"
+        elif "CHAND" in name or "LUNAR" in name:
+            return "HEO_LUNAR"
+        return "SSO"
+
+    def get_orbit_summary(self) -> Dict[str, int]:
+        """Returns a count of satellites per orbit regime."""
+        summary: Dict[str, int] = {}
+        for sat in self.satellites:
+            orbit = sat.get("orbit_type", sat.get("orbit", "UNKNOWN"))
+            if not orbit or orbit == "UNKNOWN":
+                orbit = self._infer_orbit(sat)
+            summary[orbit] = summary.get(orbit, 0) + 1
+        return summary
 
 
 # Quick diagnostic run
@@ -347,5 +529,9 @@ if __name__ == "__main__":
         bz_field_nt=-18.5,
         proton_flux_pfu=240.0,
     )
-    print(f"Hazard Assessment Complete: {hazards['critical_count']} CRITICAL | {hazards['warning_count']} WARNING")
-    print(f"Top At-Risk Asset: {hazards['fleet_hazard_profile'][0]['name']} -> Hazard Ratio: {hazards['fleet_hazard_profile'][0]['hazard_ratio']}")
+    print(
+        f"Hazard Assessment Complete: {hazards['critical_count']} CRITICAL | {hazards['warning_count']} WARNING"
+    )
+    print(
+        f"Top At-Risk Asset: {hazards['fleet_hazard_profile'][0]['name']} -> Hazard Ratio: {hazards['fleet_hazard_profile'][0]['hazard_ratio']}"
+    )

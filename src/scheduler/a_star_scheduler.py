@@ -45,6 +45,7 @@ ACTION_TAXONOMY: Dict[str, Dict[str, Any]] = {
     "ENTER_SAFE_MODE": {
         "code": "CMD_0x1A",
         "power_w": 15.0,
+        "torque_nm": 2.0,
         "cooldown_s": 300,
         "description": "Safe-mode bus: Cut payload high voltage, align panels edge-on.",
         "urgency_tier": "CRITICAL",
@@ -52,6 +53,7 @@ ACTION_TAXONOMY: Dict[str, Dict[str, Any]] = {
     "ATTITUDE_SHIELD_TILT": {
         "code": "CMD_0x2B",
         "power_w": 45.0,
+        "torque_nm": 15.0,
         "cooldown_s": 180,
         "description": "Rotate spacecraft bus to orient radiation shield towards CME front.",
         "urgency_tier": "CRITICAL",
@@ -59,6 +61,7 @@ ACTION_TAXONOMY: Dict[str, Dict[str, Any]] = {
     "POWER_DOWN_PAYLOAD": {
         "code": "CMD_0x3C",
         "power_w": 5.0,
+        "torque_nm": 0.5,
         "cooldown_s": 60,
         "description": "De-energize CMOS sensors and high-gain RF transmitters.",
         "urgency_tier": "WARNING",
@@ -66,6 +69,7 @@ ACTION_TAXONOMY: Dict[str, Dict[str, Any]] = {
     "ORBITAL_MANEUVER": {
         "code": "CMD_0x4D",
         "power_w": 120.0,
+        "torque_nm": 30.0,
         "cooldown_s": 600,
         "description": "Execute RCS thruster pulse to mitigate high-drag atmospheric entry.",
         "urgency_tier": "WARNING",
@@ -73,6 +77,7 @@ ACTION_TAXONOMY: Dict[str, Dict[str, Any]] = {
     "ENHANCED_TELEMETRY_POLL": {
         "code": "CMD_0x5E",
         "power_w": 2.0,
+        "torque_nm": 0.2,
         "cooldown_s": 30,
         "description": "Increase housekeeping packet rate to 1 Hz for critical monitoring.",
         "urgency_tier": "ELEVATED",
@@ -80,6 +85,7 @@ ACTION_TAXONOMY: Dict[str, Dict[str, Any]] = {
     "NOMINAL_ROUTINE": {
         "code": "CMD_0x00",
         "power_w": 0.0,
+        "torque_nm": 0.0,
         "cooldown_s": 0,
         "description": "No immediate intervention required. Maintain nominal schedule.",
         "urgency_tier": "NOMINAL",
@@ -101,7 +107,9 @@ class TelecommandFrame:
     ):
         self.sat_id = sat_id
         self.cmd_action = cmd_action
-        self.action_meta = ACTION_TAXONOMY.get(cmd_action, ACTION_TAXONOMY["NOMINAL_ROUTINE"])
+        self.action_meta = ACTION_TAXONOMY.get(
+            cmd_action, ACTION_TAXONOMY["NOMINAL_ROUTINE"]
+        )
         self.cmd_code = self.action_meta["code"]
         self.params = params or {}
         self.timestamp = datetime.now(timezone.utc).isoformat()
@@ -146,12 +154,14 @@ class AStarActionScheduler:
         weight_criticality: float = 0.20,
         max_commands_per_pass: int = 15,
         max_power_budget_w: float = 600.0,
+        max_torque_budget_nm: float = 200.0,
     ):
         self.w_prox = weight_proximity
         self.w_pfail = weight_pfail
         self.w_crit = weight_criticality
         self.max_commands = max_commands_per_pass
         self.max_power_budget = max_power_budget_w
+        self.max_torque_budget = max_torque_budget_nm
 
     def _determine_best_action(
         self, hazard_ratio: float, p_fail: float, sat_type: str
@@ -216,7 +226,9 @@ class AStarActionScheduler:
             f_score = g_cost + h_cost
 
             action_name = self._determine_best_action(hazard_ratio, p_fail, sat_type)
-            action_meta = ACTION_TAXONOMY.get(action_name, ACTION_TAXONOMY["NOMINAL_ROUTINE"])
+            action_meta = ACTION_TAXONOMY.get(
+                action_name, ACTION_TAXONOMY["NOMINAL_ROUTINE"]
+            )
 
             node_data = {
                 "sat_id": sat_id,
@@ -242,40 +254,47 @@ class AStarActionScheduler:
         # Drain queue respecting ground station transmission bandwidth & power budget
         scheduled_commands: List[Dict[str, Any]] = []
         allocated_power_w = 0.0
+        allocated_torque_nm = 0.0
         rank = 1
 
         while pq and len(scheduled_commands) < self.max_commands:
             neg_f, _, node = heapq.heappop(pq)
             cmd_power = node["action_meta"]["power_w"]
+            cmd_torque = node["action_meta"].get("torque_nm", 0.0)
 
             if allocated_power_w + cmd_power <= self.max_power_budget:
-                # Generate cryptographic SHA-256 signed frame
-                frame = TelecommandFrame(
-                    sat_id=node["sat_id"],
-                    cmd_action=node["action"],
-                    params={
-                        "urgency": node["action_meta"]["urgency_tier"],
-                        "f_score": node["f_score"],
-                        "target_bus": node["orbit_type"],
-                    },
-                )
+                if allocated_torque_nm + cmd_torque <= self.max_torque_budget:
+                    # Generate cryptographic SHA-256 signed frame
+                    frame = TelecommandFrame(
+                        sat_id=node["sat_id"],
+                        cmd_action=node["action"],
+                        params={
+                            "urgency": node["action_meta"]["urgency_tier"],
+                            "f_score": node["f_score"],
+                            "target_bus": node["orbit_type"],
+                        },
+                    )
 
-                scheduled_commands.append({
-                    "priority_rank": rank,
-                    "satellite": node["sat_name"],
-                    "sat_id": node["sat_id"],
-                    "orbit": node["orbit_type"],
-                    "f_score": node["f_score"],
-                    "hazard_ratio": node["hazard_ratio"],
-                    "p_fail_72h": node["p_fail_72h"],
-                    "recommended_action": node["action"],
-                    "urgency_tier": node["action_meta"]["urgency_tier"],
-                    "power_draw_w": cmd_power,
-                    "description": node["action_meta"]["description"],
-                    "telecommand_frame": frame.to_dict(),
-                })
-                allocated_power_w += cmd_power
-                rank += 1
+                    scheduled_commands.append(
+                        {
+                            "priority_rank": rank,
+                            "satellite": node["sat_name"],
+                            "sat_id": node["sat_id"],
+                            "orbit": node["orbit_type"],
+                            "f_score": node["f_score"],
+                            "hazard_ratio": node["hazard_ratio"],
+                            "p_fail_72h": node["p_fail_72h"],
+                            "recommended_action": node["action"],
+                            "urgency_tier": node["action_meta"]["urgency_tier"],
+                            "power_draw_w": cmd_power,
+                            "torque_draw_nm": cmd_torque,
+                            "description": node["action_meta"]["description"],
+                            "telecommand_frame": frame.to_dict(),
+                        }
+                    )
+                    allocated_power_w += cmd_power
+                    allocated_torque_nm += cmd_torque
+                    rank += 1
 
         elapsed_ms = (time.perf_counter() - t0) * 1000.0
 
@@ -284,7 +303,12 @@ class AStarActionScheduler:
             "total_candidates_evaluated": len(fleet_hazards),
             "commands_scheduled_count": len(scheduled_commands),
             "allocated_power_w": round(allocated_power_w, 1),
+            "allocated_torque_nm": round(allocated_torque_nm, 1),
             "max_power_budget_w": self.max_power_budget,
+            "max_torque_budget_nm": self.max_torque_budget,
+            "torque_utilization": round(
+                allocated_torque_nm / max(self.max_torque_budget, 0.01), 4
+            ),
             "scheduler_latency_ms": round(elapsed_ms, 3),
             "latency_compliant": elapsed_ms < 50.0,
             "command_queue": scheduled_commands,
@@ -296,13 +320,21 @@ if __name__ == "__main__":
     from src.models.spatial_hazard import SpatialHazardEngine
 
     engine = SpatialHazardEngine()
-    hazard_report = engine.evaluate_storm_hazards(solar_wind_speed_kms=750.0, bz_field_nt=-16.0)
+    hazard_report = engine.evaluate_storm_hazards(
+        solar_wind_speed_kms=750.0, bz_field_nt=-16.0
+    )
 
     scheduler = AStarActionScheduler()
-    schedule_result = scheduler.schedule_telecommands(hazard_report["fleet_hazard_profile"])
+    schedule_result = scheduler.schedule_telecommands(
+        hazard_report["fleet_hazard_profile"]
+    )
 
-    print(f"Scheduled {schedule_result['commands_scheduled_count']} telecommands in {schedule_result['scheduler_latency_ms']} ms.")
+    print(
+        f"Scheduled {schedule_result['commands_scheduled_count']} telecommands in {schedule_result['scheduler_latency_ms']} ms."
+    )
     if schedule_result["command_queue"]:
         top_cmd = schedule_result["command_queue"][0]
-        print(f"Rank #1 Command: {top_cmd['satellite']} -> {top_cmd['recommended_action']}")
+        print(
+            f"Rank #1 Command: {top_cmd['satellite']} -> {top_cmd['recommended_action']}"
+        )
         print(f"SHA-256 Checksum: {top_cmd['telecommand_frame']['sha256_signature']}")
