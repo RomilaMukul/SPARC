@@ -59,68 +59,81 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
-    /* Global Dark Aerospace Theme */
+    /* ── Cosmic Starfield Background ── */
     .stApp {
-        background-color: #060913;
-        background-image: 
-            radial-gradient(circle at 50% 0%, rgba(0, 180, 255, 0.08) 0%, transparent 55%),
-            radial-gradient(circle at 100% 100%, rgba(112, 0, 255, 0.05) 0%, transparent 45%),
-            linear-gradient(rgba(0, 210, 255, 0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 210, 255, 0.02) 1px, transparent 1px);
-        background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-        font-family: 'Inter', sans-serif;
-        color: #e2f1ff;
+        background-color: #05050F;
+        background-image:
+            radial-gradient(ellipse at 15% 20%, rgba(91, 44, 156, 0.12) 0%, transparent 50%),
+            radial-gradient(ellipse at 85% 75%, rgba(20, 60, 120, 0.10) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, rgba(180, 140, 60, 0.04) 0%, transparent 40%),
+            radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 50%, transparent 50%),
+            radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.35) 50%, transparent 50%),
+            radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.4) 50%, transparent 50%),
+            radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.3) 50%, transparent 50%),
+            radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.45) 50%, transparent 50%),
+            radial-gradient(1px 1px at 85% 25%, rgba(255,255,255,0.35) 50%, transparent 50%),
+            radial-gradient(1.5px 1.5px at 15% 70%, rgba(255,255,255,0.55) 50%, transparent 50%),
+            radial-gradient(1px 1px at 90% 90%, rgba(255,255,255,0.3) 50%, transparent 50%),
+            radial-gradient(1.5px 1.5px at 50% 45%, rgba(255,255,255,0.5) 50%, transparent 50%),
+            radial-gradient(1px 1px at 35% 55%, rgba(255,255,255,0.25) 50%, transparent 50%),
+            radial-gradient(1px 1px at 65% 40%, rgba(255,255,255,0.4) 50%, transparent 50%),
+            radial-gradient(1px 1px at 5% 90%, rgba(255,255,255,0.3) 50%, transparent 50%),
+            radial-gradient(1px 1px at 78% 12%, rgba(255,255,255,0.35) 50%, transparent 50%),
+            radial-gradient(1.5px 1.5px at 45% 95%, rgba(255,255,255,0.4) 50%, transparent 50%),
+            radial-gradient(1px 1px at 20% 50%, rgba(255,255,255,0.3) 50%, transparent 50%);
+        font-family: 'Exo 2', sans-serif;
+        color: #d4dce8;
     }
 
-    /* NASA & Sci-Fi Typography */
+    /* ── Solar System Typography ── */
     h1, h2, h3, h4, .nasa-title {
         font-family: 'Orbitron', sans-serif !important;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 2.5px;
+        color: #c9d6e3;
     }
 
     .nasa-title-gradient {
-        background: linear-gradient(90deg, #00D2FF 0%, #3A7BD5 35%, #00F2FE 70%, #4FACFE 100%);
+        background: linear-gradient(90deg, #E8C547 0%, #D4A030 30%, #C9A84C 55%, #F0D060 80%, #E8C547 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 900;
-        text-shadow: 0 0 30px rgba(0, 210, 255, 0.4);
     }
 
     .nasa-mono {
-        font-family: 'Share Tech Mono', monospace !important;
+        font-family: 'Space Mono', monospace !important;
     }
 
-    /* NASA Mission Control Glass Cards */
+    /* ── Orbital Glass Cards ── */
     .nasa-card {
-        background: rgba(11, 19, 38, 0.75);
-        border: 1px solid rgba(0, 210, 255, 0.2);
-        border-radius: 8px;
+        background: rgba(12, 12, 28, 0.80);
+        border: 1px solid rgba(180, 150, 80, 0.18);
+        border-radius: 10px;
         padding: 16px 20px;
-        box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 210, 255, 0.03);
-        backdrop-filter: blur(14px);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(12px);
         margin-bottom: 14px;
-        transition: all 0.3s ease;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     .nasa-card:hover {
-        border-color: rgba(0, 210, 255, 0.45);
-        box-shadow: 0 12px 35px 0 rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 210, 255, 0.06);
+        border-color: rgba(180, 150, 80, 0.35);
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7);
     }
 
-    .nasa-card-green { border-left: 4px solid #00FF88; }
-    .nasa-card-yellow { border-left: 4px solid #FFCC00; }
-    .nasa-card-red { border-left: 4px solid #FF1744; box-shadow: 0 0 20px rgba(255, 23, 68, 0.2); }
+    .nasa-card-green { border-left: 4px solid #5EC982; }
+    .nasa-card-yellow { border-left: 4px solid #E8C547; }
+    .nasa-card-red { border-left: 4px solid #E85D5D; }
 
-    /* Telemetry KPI Metric Box */
+    /* ── Telemetry KPI Metric Box ── */
     .nasa-metric-card {
-        background: rgba(12, 22, 45, 0.85);
-        border: 1px solid rgba(0, 210, 255, 0.22);
-        border-radius: 8px;
+        background: rgba(14, 14, 32, 0.85);
+        border: 1px solid rgba(120, 100, 200, 0.18);
+        border-radius: 10px;
         padding: 14px 18px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 210, 255, 0.04);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         min-height: 110px;
         display: flex;
         flex-direction: column;
@@ -128,9 +141,9 @@ st.markdown(
     }
 
     .nasa-metric-label {
-        font-family: 'Share Tech Mono', monospace !important;
+        font-family: 'Space Mono', monospace !important;
         font-size: 0.8rem;
-        color: #79a6d2;
+        color: #8B8FAF;
         letter-spacing: 1.5px;
         text-transform: uppercase;
     }
@@ -139,58 +152,79 @@ st.markdown(
         font-family: 'Orbitron', sans-serif !important;
         font-weight: 800;
         font-size: 1.85rem;
-        color: #00F0FF;
-        text-shadow: 0 0 16px rgba(0, 240, 255, 0.65);
+        color: #7EB8DA;
         line-height: 1.1;
+        text-shadow: 0 0 15px rgba(126, 184, 218, 0.6);
     }
 
-    /* Badges */
-    .badge-green { background: rgba(0, 255, 136, 0.15); color: #00FF88; border: 1px solid #00FF88; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-family: 'Share Tech Mono'; }
-    .badge-yellow { background: rgba(255, 204, 0, 0.15); color: #FFCC00; border: 1px solid #FFCC00; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-family: 'Share Tech Mono'; }
-    .badge-red { background: rgba(255, 23, 68, 0.2); color: #FF1744; border: 1px solid #FF1744; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-family: 'Share Tech Mono'; animation: blink 1.2s infinite; }
+    /* ── Badges (glowing highlight backgrounds) ── */
+    .badge-green { color: #5EC982; border: 1px solid #5EC982; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-family: 'Space Mono', monospace; background: rgba(94, 201, 130, 0.15); box-shadow: 0 0 12px rgba(94, 201, 130, 0.4); text-shadow: 0 0 8px rgba(94, 201, 130, 0.6); }
+    .badge-yellow { color: #E8C547; border: 1px solid #E8C547; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-family: 'Space Mono', monospace; background: rgba(232, 197, 71, 0.15); box-shadow: 0 0 12px rgba(232, 197, 71, 0.4); text-shadow: 0 0 8px rgba(232, 197, 71, 0.6); }
+    .badge-red { color: #E85D5D; border: 1px solid #E85D5D; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-family: 'Space Mono', monospace; background: rgba(232, 93, 93, 0.15); box-shadow: 0 0 12px rgba(232, 93, 93, 0.4); text-shadow: 0 0 8px rgba(232, 93, 93, 0.6); animation: blink 1.2s infinite; }
 
     @keyframes blink {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.4; }
     }
 
-    /* Pulsing Status LEDs */
+    /* ── Status LEDs (subtle pulse, no glow) ── */
     @keyframes pulse-green {
-        0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.8); }
-        70% { box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+        0% { box-shadow: 0 0 0 0 rgba(94, 201, 130, 0.6); }
+        70% { box-shadow: 0 0 0 8px rgba(94, 201, 130, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(94, 201, 130, 0); }
     }
     @keyframes pulse-red {
-        0% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.9); }
-        70% { box-shadow: 0 0 0 12px rgba(255, 23, 68, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
+        0% { box-shadow: 0 0 0 0 rgba(232, 93, 93, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(232, 93, 93, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(232, 93, 93, 0); }
     }
-    .led-green { display: inline-block; width: 10px; height: 10px; background-color: #00FF88; border-radius: 50%; animation: pulse-green 2s infinite; margin-right: 8px; }
-    .led-red { display: inline-block; width: 10px; height: 10px; background-color: #FF1744; border-radius: 50%; animation: pulse-red 0.8s infinite; margin-right: 8px; }
+    .led-green { display: inline-block; width: 10px; height: 10px; background-color: #5EC982; border-radius: 50%; animation: pulse-green 2s infinite; margin-right: 8px; }
+    .led-red { display: inline-block; width: 10px; height: 10px; background-color: #E85D5D; border-radius: 50%; animation: pulse-red 0.8s infinite; margin-right: 8px; }
 
-    /* Streamlit Tabs Navigation Bar */
+    /* ── Streamlit Tabs — Orbital Navigation ── */
     .stTabs [data-baseweb="tab-list"] {
         gap: 6px;
-        background-color: rgba(10, 18, 36, 0.7);
+        background-color: rgba(10, 10, 24, 0.75);
         padding: 6px 8px;
-        border-radius: 8px;
-        border: 1px solid rgba(0, 210, 255, 0.2);
+        border-radius: 10px;
+        border: 1px solid rgba(120, 100, 200, 0.15);
     }
     .stTabs [data-baseweb="tab"] {
         font-family: 'Orbitron', sans-serif !important;
         font-size: 0.82rem !important;
         letter-spacing: 1px;
-        color: #8bb2df !important;
-        border-radius: 6px;
+        color: #8B8FAF !important;
+        border-radius: 8px;
         padding: 10px 18px;
-        transition: all 0.2s ease;
+        transition: color 0.2s ease, border-color 0.2s ease;
     }
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, rgba(0, 210, 255, 0.2) 0%, rgba(58, 123, 213, 0.3) 100%) !important;
-        color: #00F2FE !important;
-        border: 1px solid rgba(0, 210, 255, 0.6) !important;
-        text-shadow: 0 0 12px rgba(0, 242, 254, 0.8);
+        background: rgba(120, 100, 200, 0.12) !important;
+        color: #E8C547 !important;
+        border: 1px solid rgba(232, 197, 71, 0.4) !important;
     }
+
+    /* ── Sidebar Cosmic Tint ── */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0A0A1E 0%, #0D0B22 50%, #0F0D26 100%) !important;
+        border-right: 1px solid rgba(120, 100, 200, 0.12);
+    }
+
+    /* ── Scrollbar Styling ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0A0A1E; }
+    ::-webkit-scrollbar-thumb { background: rgba(120, 100, 200, 0.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(120, 100, 200, 0.5); }
+
+    /* ── Streamlit Widget Overrides for Space Theme ── */
+    .stSlider > div > div > div > div { background-color: #E8C547 !important; }
+    .stSelectbox > div > div { background-color: rgba(14, 14, 32, 0.9) !important; border-color: rgba(120, 100, 200, 0.2) !important; }
+    div[data-testid="stMetric"] { background: rgba(14, 14, 32, 0.6); border: 1px solid rgba(120, 100, 200, 0.12); border-radius: 8px; padding: 10px 14px; }
+    div[data-testid="stMetricValue"] { font-family: 'Orbitron', sans-serif !important; color: #7EB8DA; }
+    div[data-testid="stMetricLabel"] { font-family: 'Space Mono', monospace !important; color: #8B8FAF; text-transform: uppercase; letter-spacing: 1px; font-size: 0.78rem; }
+
+    /* ── Expander Styling ── */
+    .streamlit-expanderHeader { font-family: 'Exo 2', sans-serif !important; font-weight: 600; color: #c9d6e3 !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -232,7 +266,7 @@ def load_action_scheduler():
 # -----------------------------------------------------------------------------
 with st.sidebar:
     st.markdown("<h2 class='nasa-title-gradient'>🛰️ DSN TELEMETRY</h2>", unsafe_allow_html=True)
-    st.markdown("<div class='nasa-mono' style='font-size:0.8rem; color:#79a6d2;'>ISRO ISTRAC • MCF • NASA DSN LIVE INGEST</div>", unsafe_allow_html=True)
+    st.markdown("<div class='nasa-mono' style='font-size:0.8rem; color:#8B8FAF;'>ISRO ISTRAC • MCF • NASA DSN LIVE INGEST</div>", unsafe_allow_html=True)
     st.divider()
 
     st.markdown("### 🌐 Space Weather Simulation Preset")
@@ -269,12 +303,12 @@ with st.sidebar:
     st.divider()
     st.markdown(
         """
-        <div class='nasa-mono' style='font-size: 0.78rem; color: #79a6d2; line-height: 1.6;'>
+        <div class='nasa-mono' style='font-size: 0.78rem; color: #8B8FAF; line-height: 1.6;'>
         <b>GROUND STATION NETWORK:</b><br/>
-        • ISTRAC Bengaluru: <span style="color:#00FF88;">LOCK 100%</span><br/>
-        • MCF Hassan: <span style="color:#00FF88;">LOCK 100%</span><br/>
-        • DSN Goldstone/Madrid: <span style="color:#00FF88;">ACTIVE</span><br/>
-        • Uplink Encryption: <span style="color:#00D2FF;">HMAC-SHA256</span>
+        • ISTRAC Bengaluru: <span style="color:#5EC982;">LOCK 100%</span><br/>
+        • MCF Hassan: <span style="color:#5EC982;">LOCK 100%</span><br/>
+        • DSN Goldstone/Madrid: <span style="color:#5EC982;">ACTIVE</span><br/>
+        • Uplink Encryption: <span style="color:#7EB8DA;">HMAC-SHA256</span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -321,7 +355,7 @@ h_left, h_right = st.columns([3, 1])
 with h_left:
     st.markdown("<h1 class='nasa-title-gradient'>🚀 SPARC-PM : ISRO MISSION OPERATIONS CENTER</h1>", unsafe_allow_html=True)
     st.markdown(
-        "<div class='nasa-mono' style='color:#00D2FF; margin-top:-10px; font-size:0.95rem;'>"
+        "<div class='nasa-mono' style='color:#8B8FAF; margin-top:-10px; font-size:0.95rem;'>"
         "AUTONOMOUS SPACE WEATHER RISK CLASSIFICATION, GAGANYAAN DOSIMETRY & 3D FLEET DEFENSE"
         "</div>",
         unsafe_allow_html=True,
@@ -331,8 +365,8 @@ with h_right:
     st.markdown(
         f"""
         <div class='nasa-card' style='text-align:right; padding:10px 16px; margin-bottom:0;'>
-            <div class='nasa-mono' style='color:#79a6d2; font-size:0.75rem;'>MISSION ELAPSED TIME &bull; UTC</div>
-            <div class='nasa-mono' style='color:#00F0FF; font-size:1.15rem; font-weight:bold;'>{utc_str}</div>
+            <div class='nasa-mono' style='color:#8B8FAF; font-size:0.75rem;'>MISSION ELAPSED TIME &bull; UTC</div>
+            <div class='nasa-mono' style='color:#E8C547; font-size:1.15rem; font-weight:bold;'>{utc_str}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -389,10 +423,10 @@ with tab1:
             f"""
             <div class="nasa-metric-card">
                 <div class="nasa-metric-label">SOLAR PROTON FLUX</div>
-                <div class="nasa-value-tick" style="color:{'#00FF88' if sim_flux < 10 else '#FFCC00' if sim_flux < 100 else '#FF1744'};">
+                <div class="nasa-value-tick" style="color:{'#5EC982' if sim_flux < 10 else '#E8C547' if sim_flux < 100 else '#E85D5D'};">
                     {sim_flux:,.1f} <span style="font-size:0.95rem;">pfu</span>
                 </div>
-                <div class="nasa-mono" style="font-size:0.8rem; color:#79a6d2;">
+                <div class="nasa-mono" style="font-size:0.8rem; color:#8B8FAF;">
                     Sensor: Aditya-L1 ASPEX/SWIS
                 </div>
             </div>
@@ -405,9 +439,9 @@ with tab1:
             <div class="nasa-metric-card">
                 <div class="nasa-metric-label">SOLAR WIND SPEED & Bz</div>
                 <div class="nasa-value-tick">
-                    {sim_speed:.0f} <span style="font-size:0.95rem; color:#79a6d2;">km/s</span>
+                    {sim_speed:.0f} <span style="font-size:0.95rem; color:#8B8FAF;">km/s</span>
                 </div>
-                <div class="nasa-mono" style="font-size:0.8rem; color:{'#00FF88' if sim_bz >= 0 else '#FF1744'};">
+                <div class="nasa-mono" style="font-size:0.8rem; color:{'#5EC982' if sim_bz >= 0 else '#E85D5D'};">
                     IMF Bz: {sim_bz:+.1f} nT (Reconnection)
                 </div>
             </div>
@@ -419,10 +453,10 @@ with tab1:
             f"""
             <div class="nasa-metric-card">
                 <div class="nasa-metric-label">SPACECRAFT AT HIGH HAZARD</div>
-                <div class="nasa-value-tick" style="color:{'#00FF88' if hazard_report['critical_count'] == 0 else '#FF1744'};">
-                    {hazard_report['critical_count']} <span style="font-size:0.95rem; color:#79a6d2;">/ {hazard_report['total_satellites']}</span>
+                <div class="nasa-value-tick" style="color:{'#5EC982' if hazard_report['critical_count'] == 0 else '#E85D5D'};">
+                    {hazard_report['critical_count']} <span style="font-size:0.95rem; color:#8B8FAF;">/ {hazard_report['total_satellites']}</span>
                 </div>
-                <div class="nasa-mono" style="font-size:0.8rem; color:#FFCC00;">
+                <div class="nasa-mono" style="font-size:0.8rem; color:#E8C547;">
                     {hazard_report['warning_count']} Elevated Proximate Assets
                 </div>
             </div>
@@ -434,10 +468,10 @@ with tab1:
             f"""
             <div class="nasa-metric-card">
                 <div class="nasa-metric-label">GAGANYAAN CABIN RATE</div>
-                <div class="nasa-value-tick" style="color:{'#00FF88' if dosimetry_report['alert_color'] == 'GREEN' else '#FF1744'};">
+                <div class="nasa-value-tick" style="color:{'#5EC982' if dosimetry_report['alert_color'] == 'GREEN' else '#E85D5D'};">
                     {dosimetry_report['peak_dose_rate_usv_hr']:.1f} <span style="font-size:0.95rem;">μSv/hr</span>
                 </div>
-                <div class="nasa-mono" style="font-size:0.8rem; color:#79a6d2;">
+                <div class="nasa-mono" style="font-size:0.8rem; color:#8B8FAF;">
                     EVA Status: {dosimetry_report['eva_status']}
                 </div>
             </div>
@@ -465,8 +499,8 @@ with tab1:
         )
         fig_p.update_layout(
             template="plotly_dark",
-            paper_bgcolor="rgba(11,19,38,0.7)",
-            plot_bgcolor="rgba(11,19,38,0.7)",
+            paper_bgcolor="rgba(12,12,28,0.8)",
+            plot_bgcolor="rgba(12,12,28,0.8)",
             height=280,
             margin=dict(l=20, r=20, t=20, b=20),
             coloraxis_showscale=False,
@@ -479,11 +513,11 @@ with tab1:
             f"""
             <div class="nasa-card" style="height:280px; display:flex; flex-direction:column; justify-content:space-around;">
                 <div class="nasa-mono" style="font-size:0.92rem; line-height:1.9;">
-                    &bull; <b>Model Latency:</b> {severity_report['inference_latency_ms']} ms (<span style="color:#00FF88;">Sub-100ms Compliant</span>)<br/>
+                    &bull; <b>Model Latency:</b> {severity_report['inference_latency_ms']} ms (<span style="color:#5EC982;">Sub-100ms Compliant</span>)<br/>
                     &bull; <b>A* Scheduler Time:</b> {scheduled_commands['scheduler_latency_ms']} ms<br/>
                     &bull; <b>Queued Telecommands:</b> {scheduled_commands['commands_scheduled_count']} Transmissions<br/>
                     &bull; <b>Ground Station Power Budget:</b> {scheduled_commands['allocated_power_w']} W / {scheduled_commands['max_power_budget_w']} W<br/>
-                    &bull; <b>Active Crew Protocol:</b> <span style="color:#00F0FF;">{dosimetry_report['crew_action']}</span><br/>
+                    &bull; <b>Active Crew Protocol:</b> <span style="color:#7EB8DA;">{dosimetry_report['crew_action']}</span><br/>
                     &bull; <b>Corridor Dynamic Diameter:</b> {hazard_report['storm_corridor_radius_km'] * 2:,.0f} km
                 </div>
             </div>
@@ -497,7 +531,7 @@ with tab1:
 with tab2:
     st.markdown("<h2 class='nasa-title-gradient'>👨‍🚀 GAGANYAAN CREW RADIATION DOSIMETRY</h2>", unsafe_allow_html=True)
     st.markdown(
-        "<div class='nasa-mono' style='color:#79a6d2; margin-top:-10px; margin-bottom:15px;'>"
+        "<div class='nasa-mono' style='color:#8B8FAF; margin-top:-10px; margin-bottom:15px;'>"
         "PyTorch LSTM 6-Hour Forecast & Cumulative Absorbed Dose behind 3.5 g/cm² Aluminum Shielding"
         "</div>",
         unsafe_allow_html=True,
@@ -522,9 +556,9 @@ with tab2:
         y=dosimetry_report["dose_rate_usv_hr"],
         mode="lines+markers",
         name="Cabin Interior Dose Rate (μSv/hr)",
-        line=dict(color="#00F0FF", width=3.5),
+        line=dict(color="#7EB8DA", width=3.5),
         fill="tozeroy",
-        fillcolor="rgba(0, 240, 255, 0.08)",
+        fillcolor="rgba(126, 184, 218, 0.08)",
     ))
     fig_dosimetry.add_trace(go.Scatter(
         x=timeline,
@@ -536,16 +570,16 @@ with tab2:
     ))
 
     # Safety Lines
-    fig_dosimetry.add_hline(y=EVA_SAFE_THRESHOLD_USV_HR, line_dash="dot", line_color="#00FF88", annotation_text="EVA Safe Threshold (50 μSv/hr)", annotation_position="top left")
-    fig_dosimetry.add_hline(y=EVA_CAUTION_THRESHOLD_USV_HR, line_dash="dot", line_color="#FF1744", annotation_text="EVA Abort / Storm Threshold (250 μSv/hr)", annotation_position="top left")
+    fig_dosimetry.add_hline(y=EVA_SAFE_THRESHOLD_USV_HR, line_dash="dot", line_color="#5EC982", annotation_text="EVA Safe Threshold (50 μSv/hr)", annotation_position="top left")
+    fig_dosimetry.add_hline(y=EVA_CAUTION_THRESHOLD_USV_HR, line_dash="dot", line_color="#E85D5D", annotation_text="EVA Abort / Storm Threshold (250 μSv/hr)", annotation_position="top left")
 
     fig_dosimetry.update_layout(
         template="plotly_dark",
-        paper_bgcolor="rgba(11,19,38,0.7)",
-        plot_bgcolor="rgba(11,19,38,0.7)",
+        paper_bgcolor="rgba(12,12,28,0.8)",
+        plot_bgcolor="rgba(12,12,28,0.8)",
         height=420,
-        yaxis=dict(title="Cabin Dose Rate (μSv/hr)", color="#00F0FF"),
-        yaxis2=dict(title="Proton Flux (pfu)", color="#FF9900", overlaying="y", side="right"),
+        yaxis=dict(title="Cabin Dose Rate (μSv/hr)", color="#7EB8DA"),
+        yaxis2=dict(title="Proton Flux (pfu)", color="#D4A030", overlaying="y", side="right"),
         legend=dict(x=0.01, y=0.99, bgcolor="rgba(0,0,0,0.5)"),
         margin=dict(l=40, r=40, t=30, b=30),
     )
@@ -556,7 +590,7 @@ with tab2:
         f"""
         <div class="nasa-card {'nasa-card-red' if dosimetry_report['alert_color'] == 'RED' else 'nasa-card-green'}">
             <h4 style="color:#ffffff; margin-bottom:8px;">GAGANYAAN FLIGHT DIRECTIVE & CREW ACTION:</h4>
-            <div class="nasa-mono" style="font-size:1.05rem; color:#00D2FF;">
+            <div class="nasa-mono" style="font-size:1.05rem; color:#7EB8DA;">
                 <b>DIRECTIVE:</b> {dosimetry_report['crew_action']} &nbsp;|&nbsp; <b>PROTOCOL:</b> {dosimetry_report['action_guidance']}
             </div>
         </div>
@@ -570,7 +604,7 @@ with tab2:
 with tab3:
     st.markdown("<h2 class='nasa-title-gradient'>🌐 3D FLEET ORBITAL HAZARD RADAR</h2>", unsafe_allow_html=True)
     st.markdown(
-        "<div class='nasa-mono' style='color:#79a6d2; margin-top:-10px; margin-bottom:15px;'>"
+        "<div class='nasa-mono' style='color:#8B8FAF; margin-top:-10px; margin-bottom:15px;'>"
         "SGP4 True Equator Orbital Ephemeris & 3D Dynamic Storm Corridor Proximity Intersections"
         "</div>",
         unsafe_allow_html=True,
@@ -598,7 +632,7 @@ with tab3:
     ))
 
     # Satellite Orbital Markers Categorized by Alert Status
-    for alert_tier, hex_col in [("CRITICAL", "#FF1744"), ("WARNING", "#FFCC00"), ("ELEVATED", "#00D2FF"), ("NOMINAL", "#00FF88")]:
+    for alert_tier, hex_col in [("CRITICAL", "#E85D5D"), ("WARNING", "#E8C547"), ("ELEVATED", "#7EB8DA"), ("NOMINAL", "#5EC982")]:
         sub = fleet_table[fleet_table["alert_level"] == alert_tier]
         if not sub.empty:
             coords = np.array(sub["r_ecef"].tolist())
@@ -615,7 +649,7 @@ with tab3:
 
     fig_globe.update_layout(
         template="plotly_dark",
-        paper_bgcolor="rgba(11,19,38,0.8)",
+        paper_bgcolor="rgba(12,12,28,0.8)",
         height=540,
         margin=dict(l=0, r=0, t=0, b=0),
         scene=dict(
@@ -649,7 +683,7 @@ with tab3:
 with tab4:
     st.markdown("<h2 class='nasa-title-gradient'>🛠️ DEEP LEARNING PREDICTIVE MAINTENANCE</h2>", unsafe_allow_html=True)
     st.markdown(
-        "<div class='nasa-mono' style='color:#79a6d2; margin-top:-10px; margin-bottom:15px;'>"
+        "<div class='nasa-mono' style='color:#8B8FAF; margin-top:-10px; margin-bottom:15px;'>"
         "PyTorch 1D-CNN + LSTM 72-Hour Component Failure Probability P_fail conditioned on Space Weather Stress"
         "</div>",
         unsafe_allow_html=True,
@@ -678,8 +712,8 @@ with tab4:
     )
     fig_top.update_layout(
         template="plotly_dark",
-        paper_bgcolor="rgba(11,19,38,0.7)",
-        plot_bgcolor="rgba(11,19,38,0.7)",
+        paper_bgcolor="rgba(12,12,28,0.8)",
+        plot_bgcolor="rgba(12,12,28,0.8)",
         height=320,
     )
     st.plotly_chart(fig_top, width="stretch")
@@ -707,7 +741,7 @@ with tab4:
 with tab5:
     st.markdown("<h2 class='nasa-title-gradient'>📡 A* CLOSED-LOOP COMMAND SYNTHESIZER</h2>", unsafe_allow_html=True)
     st.markdown(
-        "<div class='nasa-mono' style='color:#79a6d2; margin-top:-10px; margin-bottom:15px;'>"
+        "<div class='nasa-mono' style='color:#8B8FAF; margin-top:-10px; margin-bottom:15px;'>"
         "A* Priority Queue Search & Cryptographically Signed HMAC-SHA256 Binary Telecommand Frames"
         "</div>",
         unsafe_allow_html=True,
@@ -747,7 +781,7 @@ with tab5:
 with tab6:
     st.markdown("<h2 class='nasa-title-gradient'>📈 INCIDENT ANALYTICS & MODEL BENCHMARKS</h2>", unsafe_allow_html=True)
     st.markdown(
-        "<div class='nasa-mono' style='color:#79a6d2; margin-top:-10px; margin-bottom:15px;'>"
+        "<div class='nasa-mono' style='color:#8B8FAF; margin-top:-10px; margin-bottom:15px;'>"
         "Empirical Model Validation on the Historical May 2024 Mother's Day Super-Storm and October 2024 CME"
         "</div>",
         unsafe_allow_html=True,
