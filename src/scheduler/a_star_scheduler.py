@@ -181,20 +181,34 @@ class AStarActionScheduler:
 
         # Build lookup for predictive maintenance failure probabilities
         pfail_map: Dict[str, float] = {}
+        pfail_by_idx: List[float] = []
         if fleet_maintenance:
             for item in fleet_maintenance:
-                pfail_map[item.get("sat_id", "")] = float(item.get("p_fail_72h", 0.05))
+                p_val = float(item.get("p_fail_72h", 0.05))
+                if item.get("sat_id"):
+                    pfail_map[item["sat_id"]] = p_val
+                if item.get("name"):
+                    pfail_map[item["name"]] = p_val
+                pfail_by_idx.append(p_val)
 
         # Priority Queue for A* Search (Python min-heap: store negative f(n) for max priority)
         pq: List[Tuple[float, int, Dict[str, Any]]] = []
         counter = 0
 
-        for sat in fleet_hazards:
-            sat_id = sat.get("sat_id", sat.get("name", "SAT"))
+        for idx, sat in enumerate(fleet_hazards):
+            sat_id = sat.get("sat_id", sat.get("name", sat.get("satellite", "SAT")))
+            sat_name = sat.get("name", sat.get("satellite", sat_id))
             hazard_ratio = float(sat.get("hazard_ratio", 0.0))
             crit_weight = float(sat.get("criticality", 0.5))
             sat_type = sat.get("orbit_type", "LEO")
-            p_fail = pfail_map.get(sat_id, 0.05)
+
+            # Match p_fail by ID, name, or cyclic index fallback
+            p_fail = pfail_map.get(sat_id, pfail_map.get(sat_name, None))
+            if p_fail is None and pfail_by_idx:
+                p_fail = pfail_by_idx[idx % len(pfail_by_idx)]
+            elif p_fail is None:
+                p_fail = 0.05
+
             time_to_entry_s = float(sat.get("time_to_corridor_sec", 3600.0))
 
             # 1. Edge Cost Function g(n) in [0, 1]
@@ -261,11 +275,16 @@ class AStarActionScheduler:
                     "sat_id": node["sat_id"],
                     "orbit": node["orbit_type"],
                     "f_score": node["f_score"],
+                    "g_cost": node["g_cost"],
+                    "h_heuristic": node["h_heuristic"],
+                    "time_to_corridor_s": node["time_to_corridor_s"],
+                    "criticality": node["criticality"],
                     "hazard_ratio": node["hazard_ratio"],
                     "p_fail_72h": node["p_fail_72h"],
                     "recommended_action": node["action"],
                     "urgency_tier": node["action_meta"]["urgency_tier"],
                     "power_draw_w": cmd_power,
+                    "cooldown_s": node["action_meta"]["cooldown_s"],
                     "description": node["action_meta"]["description"],
                     "telecommand_frame": frame.to_dict(),
                 })
@@ -278,12 +297,26 @@ class AStarActionScheduler:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "total_candidates_evaluated": len(fleet_hazards),
             "commands_scheduled_count": len(scheduled_commands),
+            "max_commands_per_pass": self.max_commands,
             "allocated_power_w": round(allocated_power_w, 1),
             "max_power_budget_w": self.max_power_budget,
             "scheduler_latency_ms": round(elapsed_ms, 3),
             "latency_compliant": elapsed_ms < 50.0,
             "command_queue": scheduled_commands,
+            "total_power_w": round(allocated_power_w, 1),
         }
+
+    def schedule(
+        self,
+        fleet_hazards: List[Dict[str, Any]],
+        fleet_maintenance: Optional[List[Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """Alias for schedule_telecommands with total_power_w field."""
+        return self.schedule_telecommands(fleet_hazards, fleet_maintenance)
+
+
+# Backward compatibility alias
+AStarTelecommandScheduler = AStarActionScheduler
 
 
 if __name__ == "__main__":

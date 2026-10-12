@@ -170,6 +170,10 @@ class SpaceWeatherSeverityClassifier:
             "probabilities": {SEVERITY_MAP[k]: round(v, 4) for k, v in proba.items()},
             "inference_latency_ms": round(dt, 2),
         }
+
+    def classify(self, telemetry: Dict[str, float]) -> Dict[str, Any]:
+        """Alias for predict_single."""
+        return self.predict_single(telemetry)
 if __name__ == '__main__':
     print('?? Held-out validation report (vs. historical benchmarks):')
     print('    accuracy                           1.00     53444')

@@ -30,14 +30,14 @@ MODEL_DIR = PROJECT_ROOT / "models"
 DEFAULT_MODEL_PATH = MODEL_DIR / "predictive_maint.pt"
 SYNTHETIC_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "synthetic_fleet_telemetry.csv"
 
-# Check for PyTorch
+# Check for PyTorch (catch OSError if Windows Application Control blocks shm.dll)
 try:
     import torch
     import torch.nn as nn
     import torch.optim as optim
     from torch.utils.data import DataLoader, TensorDataset
     HAS_TORCH = True
-except ImportError:
+except (ImportError, OSError, Exception):
     HAS_TORCH = False
 
 

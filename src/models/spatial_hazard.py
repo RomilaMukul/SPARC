@@ -114,22 +114,36 @@ class SpatialHazardEngine:
         self._load_tle_database(tle_source)
 
     def _load_tle_database(self, source: Optional[Union[str, Path, List[Dict[str, Any]]]] = None) -> None:
-        """Loads TLE data from JSON or initializes 50-satellite representative ISRO fleet."""
+        """Loads real Keplerian parameters from fleet CSV or synthesizes 50-satellite representative ISRO fleet."""
         loaded = False
-        target_path = Path(source) if isinstance(source, (str, Path)) else DEFAULT_TLE_PATH
+        fleet_csv_path = Path(__file__).resolve().parents[2] / "data" / "processed" / "fleet_orbital_parameters.csv"
 
-        if target_path and target_path.exists():
+        if fleet_csv_path.exists():
             try:
-                with open(target_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    if isinstance(data, list) and len(data) > 0:
-                        self.satellites = data
-                        loaded = True
+                df = pd.read_csv(fleet_csv_path)
+                records = []
+                for idx, row in df.iterrows():
+                    s_name = str(row.get("satellite_name", f"SAT-{idx+1}"))
+                    crit = 1.0 if "GAGANYAAN" in s_name.upper() else 0.75
+                    records.append({
+                        "sat_id": f"ISRO-{idx+1:03d}",
+                        "name": s_name,
+                        "norad_id": str(row.get("norad_id", 90000 + idx)),
+                        "orbit_type": str(row.get("orbital_regime", "LEO")).split(" ")[0],
+                        "altitude_km": float(row.get("perigee_alt_km", 600.0)),
+                        "inclination_deg": float(row.get("inclination_deg", 51.6)),
+                        "raan_deg": float(row.get("raan_deg", 0.0)),
+                        "mean_anomaly_deg": float(row.get("mean_anomaly_deg", 0.0)),
+                        "criticality_weight": crit,
+                    })
+                if records:
+                    synthetic_rest = self._build_synthetic_isro_fleet(50)[len(records):]
+                    self.satellites = records + synthetic_rest
+                    loaded = True
             except Exception as e:
-                print(f"[WARN] Could not load TLE JSON ({e}). Utilizing fleet builder.")
+                print(f"[WARN] Could not load fleet CSV ({e}). Utilizing fleet builder.")
 
         if not loaded:
-            # Build representative 50-satellite fleet across diverse orbits
             self.satellites = self._build_synthetic_isro_fleet(50)
 
     def _build_synthetic_isro_fleet(self, count: int = 50) -> List[Dict[str, Any]]:
@@ -239,6 +253,89 @@ class SpatialHazardEngine:
         """Propagates all satellites in the fleet simultaneously."""
         dt = timestamp or datetime.now(timezone.utc)
         return [self.propagate_single(sat, dt) for sat in self.satellites]
+
+    def get_fleet_positions(self, timestamp: Optional[datetime] = None) -> List[Dict[str, Any]]:
+        """Alias for propagate_fleet."""
+        return self.propagate_fleet(timestamp)
+
+    def propagate_orbit_trajectory(
+        self, sat_info: Dict[str, Any], n_points: int = 100
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Computes one full orbital period of ECEF trajectory coordinates
+        for a single satellite, suitable for Plotly Scatter3d orbit lines.
+
+        Uses the same Keplerian circular-orbit propagation as propagate_single().
+        Deterministic: uses a fixed reference time so output is stable across reruns.
+
+        Args:
+            sat_info: Satellite parameter dict (altitude_km, inclination_deg, etc.)
+            n_points: Number of sample points around the orbit.
+
+        Returns:
+            Dict with 'x', 'y', 'z' lists (ECEF km) and metadata, or None on error.
+        """
+        try:
+            alt_km = float(sat_info.get("altitude_km", 600.0))
+            inc_deg = float(sat_info.get("inclination_deg", 51.6))
+            raan_deg = float(sat_info.get("raan_deg", 0.0))
+
+            a_km = EARTH_RADIUS_KM + alt_km
+            if a_km <= 0:
+                return None
+
+            # Orbital period T = 2*pi * sqrt(a^3 / mu)  [seconds]
+            period_s = 2.0 * math.pi * math.sqrt(a_km**3 / MU_EARTH)
+
+            # Use a fixed reference time for deterministic output
+            ref_dt = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+            gst_ref = calculate_gst_rad(ref_dt)
+
+            inc_rad = math.radians(inc_deg)
+            raan_rad = math.radians(raan_deg)
+            mean_anom_base = math.radians(float(sat_info.get("mean_anomaly_deg", 0.0)))
+
+            # Mean motion n (rad/s)
+            n_rad_s = math.sqrt(MU_EARTH / (a_km**3))
+
+            # Base time offset matching propagate_single's convention
+            base_t_sec = ref_dt.minute * 60 + ref_dt.second + (ref_dt.microsecond / 1e6)
+
+            xs, ys, zs = [], [], []
+            for i in range(n_points + 1):  # +1 to close the loop
+                dt_offset = (i / n_points) * period_s
+                t_sec = base_t_sec + dt_offset
+                M_rad = mean_anom_base + n_rad_s * t_sec
+
+                # Orbital plane (circular orbit)
+                x_orb = a_km * math.cos(M_rad)
+                y_orb = a_km * math.sin(M_rad)
+
+                # Rotate to ECI
+                x_eci = (math.cos(raan_rad) * x_orb) - (math.sin(raan_rad) * y_orb * math.cos(inc_rad))
+                y_eci = (math.sin(raan_rad) * x_orb) + (math.cos(raan_rad) * y_orb * math.cos(inc_rad))
+                z_eci = y_orb * math.sin(inc_rad)
+
+                # ECI -> ECEF using fixed GST (orbit shape in rotating frame)
+                r_eci_vec = np.array([x_eci, y_eci, z_eci])
+                r_ecef = eci_to_ecef(r_eci_vec, gst_ref)
+
+                xs.append(float(r_ecef[0]))
+                ys.append(float(r_ecef[1]))
+                zs.append(float(r_ecef[2]))
+
+            return {
+                "x": xs,
+                "y": ys,
+                "z": zs,
+                "name": sat_info.get("name", sat_info.get("sat_id", "SAT")),
+                "orbit_type": sat_info.get("orbit_type", "LEO"),
+                "altitude_km": alt_km,
+                "period_minutes": round(period_s / 60.0, 1),
+                "n_points": n_points,
+            }
+        except Exception:
+            return None
 
     def evaluate_storm_hazards(
         self,

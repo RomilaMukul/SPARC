@@ -30,13 +30,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 MODEL_DIR = PROJECT_ROOT / "models"
 DEFAULT_MODEL_PATH = MODEL_DIR / "crew_dosimetry_lstm.pt"
 
-# Check for PyTorch
+# Check for PyTorch (catch OSError if Windows Application Control blocks shm.dll)
 try:
     import torch
     import torch.nn as nn
     import torch.optim as optim
     HAS_TORCH = True
-except ImportError:
+except (ImportError, OSError, Exception):
     HAS_TORCH = False
 
 # ISRO Gaganyaan Shielding Constants
@@ -218,6 +218,14 @@ class CrewDosimetryEngine:
             "alert_color": alert_color,
             "shielding_al_g_cm2": GAGANYAAN_SHIELDING_G_CM2,
         }
+
+    def compute_dosimetry(self, telemetry: Dict[str, Any]) -> Dict[str, Any]:
+        """Computes dosimetry and EVA safety parameters from telemetry."""
+        flux = float(telemetry.get("proton_flux_pfu", 15.0))
+        speed = float(telemetry.get("proton_speed_kms", 450.0))
+        bz = float(telemetry.get("mag_bz_field", -5.0))
+        hist = [flux] * 60
+        return self.forecast_6h_radiation_curve(hist, current_wind_speed=speed, current_bz=bz)
 
     def save(self, path: Path) -> None:
         """Saves PyTorch model weights."""

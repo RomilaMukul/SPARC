@@ -7,4 +7,5 @@ venv/
 .DS_Store
 .claude/
 ~$*.docx
+.pytest_cache/
 
